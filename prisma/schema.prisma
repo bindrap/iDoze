@@ -1,0 +1,259 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id                      String    @id @default(cuid())
+  email                   String    @unique
+  passwordHash            String
+  firstName               String
+  lastName                String
+  phone                   String?
+  role                    Role      @default(MEMBER)
+  membershipStatus        MembershipStatus @default(ACTIVE)
+  membershipStartDate     DateTime?
+  membershipEndDate       DateTime?
+  emergencyContactName    String?
+  emergencyContactPhone   String?
+  medicalConditions       String?
+  isOnBench               Boolean   @default(false)
+  benchReason             String?
+  benchStartDate          DateTime?
+  benchEndDate            DateTime?
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  // Relations
+  instructedClasses       Class[]   @relation("ClassInstructor")
+  instructedSessions      ClassSession[] @relation("SessionInstructor")
+  bookings                Booking[]
+  attendance              Attendance[]
+  authoredNewsletters     Newsletter[] @relation("NewsletterAuthor")
+  memberProgress          MemberProgress[]
+  promotions              MemberProgress[] @relation("PromotedBy")
+  notifications           Notification[]
+  updatedSettings         Setting[]
+
+  @@map("users")
+}
+
+model Class {
+  id            String    @id @default(cuid())
+  name          String
+  description   String?
+  instructorId  String
+  instructor    User      @relation("ClassInstructor", fields: [instructorId], references: [id])
+  maxCapacity   Int       @default(40)
+  durationMinutes Int     @default(60)
+  skillLevel    SkillLevel @default(ALL)
+  isRecurring   Boolean   @default(true)
+  dayOfWeek     Int?      // 0=Sunday, 1=Monday, etc.
+  startTime     String?
+  endTime       String?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  sessions      ClassSession[]
+
+  @@map("classes")
+}
+
+model ClassSession {
+  id                String    @id @default(cuid())
+  classId           String
+  class             Class     @relation(fields: [classId], references: [id])
+  sessionDate       DateTime
+  startTime         String
+  endTime           String
+  instructorId      String
+  instructor        User      @relation("SessionInstructor", fields: [instructorId], references: [id])
+  maxCapacity       Int       @default(40)
+  currentBookings   Int       @default(0)
+  status            SessionStatus @default(SCHEDULED)
+  techniquesCovered String?
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  bookings          Booking[]
+  attendance        Attendance[]
+
+  @@map("class_sessions")
+}
+
+model Booking {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  classSessionId    String
+  classSession      ClassSession @relation(fields: [classSessionId], references: [id])
+  bookingStatus     BookingStatus @default(BOOKED)
+  bookingDate       DateTime  @default(now())
+  checkInTime       DateTime?
+  cancellationTime  DateTime?
+  cancellationReason String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@unique([userId, classSessionId])
+  @@map("bookings")
+}
+
+model Attendance {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  classSessionId    String
+  classSession      ClassSession @relation(fields: [classSessionId], references: [id])
+  checkInTime       DateTime
+  checkOutTime      DateTime?
+  attendanceStatus  AttendanceStatus @default(PRESENT)
+  notes             String?
+  createdAt         DateTime  @default(now())
+
+  @@unique([userId, classSessionId])
+  @@map("attendance")
+}
+
+model Newsletter {
+  id              String    @id @default(cuid())
+  title           String
+  content         String
+  authorId        String
+  author          User      @relation("NewsletterAuthor", fields: [authorId], references: [id])
+  publishDate     DateTime  @default(now())
+  isPublished     Boolean   @default(false)
+  targetAudience  Audience  @default(ALL)
+  priority        Priority  @default(NORMAL)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("newsletters")
+}
+
+model MemberProgress {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  beltRank              String?
+  stripes               Int       @default(0)
+  promotionDate         DateTime?
+  promotedById          String?
+  promotedBy            User?     @relation("PromotedBy", fields: [promotedById], references: [id])
+  totalClassesAttended  Int       @default(0)
+  lastAttendanceDate    DateTime?
+  notes                 String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@map("member_progress")
+}
+
+model Notification {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  type            NotificationType
+  title           String
+  message         String
+  isRead          Boolean   @default(false)
+  deliveryMethod  DeliveryMethod @default(IN_APP)
+  scheduledTime   DateTime?
+  sentTime        DateTime?
+  status          NotificationStatus @default(PENDING)
+  createdAt       DateTime  @default(now())
+
+  @@map("notifications")
+}
+
+model Setting {
+  id           String   @id @default(cuid())
+  settingKey   String   @unique
+  settingValue String?
+  description  String?
+  updatedById  String?
+  updatedBy    User?    @relation(fields: [updatedById], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("settings")
+}
+
+// Enums
+enum Role {
+  MEMBER
+  COACH
+  ADMIN
+}
+
+enum MembershipStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  ALL
+}
+
+enum SessionStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum BookingStatus {
+  BOOKED
+  CHECKED_IN
+  NO_SHOW
+  CANCELLED
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  LEFT_EARLY
+}
+
+enum Audience {
+  ALL
+  MEMBERS
+  COACHES
+}
+
+enum Priority {
+  LOW
+  NORMAL
+  HIGH
+}
+
+enum NotificationType {
+  MISSED_CLASS
+  BOOKING_REMINDER
+  NEWSLETTER
+  GENERAL
+}
+
+enum DeliveryMethod {
+  EMAIL
+  SMS
+  IN_APP
+}
+
+enum NotificationStatus {
+  PENDING
+  SENT
+  FAILED
+}
