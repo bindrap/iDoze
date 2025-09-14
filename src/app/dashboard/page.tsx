@@ -77,7 +77,7 @@ async function getUserDashboardData(userId: string) {
       }
     }),
 
-    prisma.memberProgress.findUnique({
+    prisma.memberProgress.findFirst({
       where: { userId }
     })
   ])

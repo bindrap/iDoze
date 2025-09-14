@@ -49,40 +49,78 @@ A comprehensive web application for managing jiu jitsu gym operations including 
    - Configure SMTP settings for email notifications
    - Adjust app configuration values as needed
 
-4. **Initialize the database**
+4. **Install missing dependencies**
+   ```bash
+   npm install tailwindcss-animate
+   ```
+
+5. **Initialize the database**
    ```bash
    npm run db:generate
    npm run db:push
    ```
 
-5. **Seed initial data**
+6. **Seed initial data** (optional)
    ```bash
    node scripts/seed.js
    ```
 
-6. **Start the development server**
+7. **Start the development server**
    ```bash
    npm run dev
    ```
 
-7. **Open your browser**
+8. **Open your browser**
    Navigate to `http://localhost:3000`
 
-## Default Users
+## Quick Start (TL;DR)
+
+```bash
+# Clone and setup
+git clone <your-repo-url>
+cd iDoze
+
+# Install dependencies
+npm install
+npm install tailwindcss-animate
+
+# Setup environment
+cp .env.example .env
+
+# Initialize database
+npm run db:generate
+npm run db:push
+
+# Start development server
+npm run dev
+```
+
+Then open http://localhost:3000 in your browser.
+
+## Default Users & Test Data
 
 After seeding, you can log in with these accounts:
 
-**Admin Account:**
-- Email: admin@tecumseh-jujutsu.com
-- Password: admin123
+**Admin Account** (Full system access):
+- Email: `admin@tecumseh-jujutsu.com`
+- Password: `admin123`
 
-**Coach Account:**
-- Email: coach@tecumseh-jujutsu.com
-- Password: coach123
+**Coach Account** (Coach + Member features):
+- Email: `coach@tecumseh-jujutsu.com`
+- Password: `coach123`
 
-**Member Account:**
-- Email: member@tecumseh-jujutsu.com
-- Password: member123
+**Member Account** (Basic member features):
+- Email: `member@tecumseh-jujutsu.com`
+- Password: `member123`
+
+### Sample Classes Created:
+- **Morning Adults BJJ** - Monday-Friday 9:30-10:30 AM (All skill levels)
+- **Kids Brazilian Jiu-Jitsu** - Monday-Friday 6:00-6:45 PM (Ages 6-12)
+- **Evening Adults BJJ** - Monday-Thursday 7:00-8:00 PM (All skill levels)
+- **Saturday Adults BJJ** - Saturday 11:00 AM-12:00 PM (All skill levels)
+- **Sunday Open Mat** - Sunday 11:00 AM-12:30 PM (Open training for all levels)
+
+The seed script creates 4 weeks of upcoming class sessions, member progress data, system settings, and a sample newsletter.
 
 ## Key Features Breakdown
 
@@ -148,6 +186,23 @@ After seeding, you can log in with these accounts:
 - `GET /api/analytics?type=utilization` - Utilization metrics
 - `GET /api/analytics?type=members` - Member analytics
 
+## Troubleshooting
+
+### Common Issues
+
+1. **"Cannot find module 'tailwindcss-animate'" error**
+   ```bash
+   npm install tailwindcss-animate
+   ```
+
+2. **Prisma enum errors with SQLite**
+   - The schema has been updated to use string fields instead of enums for SQLite compatibility
+   - Run `npm run db:generate && npm run db:push` to update
+
+3. **Database connection issues**
+   - Ensure the `.env` file exists with proper configuration
+   - The SQLite database will be created automatically in `prisma/dev.db`
+
 ## Database Schema
 
 The application uses a comprehensive database schema with the following main entities:
@@ -161,6 +216,8 @@ The application uses a comprehensive database schema with the following main ent
 - **Newsletters**: System announcements
 - **Notifications**: Automated alerts
 - **Settings**: System configuration
+
+**Note**: All enum fields have been converted to string fields for SQLite compatibility.
 
 ## Security Features
 

@@ -1,9 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { prisma } from './db'
+import { authOptions } from './auth-config'
 
 export async function getCurrentUser() {
-  const session = await getServerSession()
+  const session = await getServerSession(authOptions)
   return session?.user
 }
 

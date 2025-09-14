@@ -14,8 +14,8 @@ model User {
   firstName               String
   lastName                String
   phone                   String?
-  role                    Role      @default(MEMBER)
-  membershipStatus        MembershipStatus @default(ACTIVE)
+  role                    String    @default("MEMBER")
+  membershipStatus        String    @default("ACTIVE")
   membershipStartDate     DateTime?
   membershipEndDate       DateTime?
   emergencyContactName    String?
@@ -50,7 +50,7 @@ model Class {
   instructor    User      @relation("ClassInstructor", fields: [instructorId], references: [id])
   maxCapacity   Int       @default(40)
   durationMinutes Int     @default(60)
-  skillLevel    SkillLevel @default(ALL)
+  skillLevel    String     @default("ALL")
   isRecurring   Boolean   @default(true)
   dayOfWeek     Int?      // 0=Sunday, 1=Monday, etc.
   startTime     String?
@@ -76,7 +76,7 @@ model ClassSession {
   instructor        User      @relation("SessionInstructor", fields: [instructorId], references: [id])
   maxCapacity       Int       @default(40)
   currentBookings   Int       @default(0)
-  status            SessionStatus @default(SCHEDULED)
+  status            String        @default("SCHEDULED")
   techniquesCovered String?
   notes             String?
   createdAt         DateTime  @default(now())
@@ -95,7 +95,7 @@ model Booking {
   user              User      @relation(fields: [userId], references: [id])
   classSessionId    String
   classSession      ClassSession @relation(fields: [classSessionId], references: [id])
-  bookingStatus     BookingStatus @default(BOOKED)
+  bookingStatus     String        @default("BOOKED")
   bookingDate       DateTime  @default(now())
   checkInTime       DateTime?
   cancellationTime  DateTime?
@@ -115,7 +115,7 @@ model Attendance {
   classSession      ClassSession @relation(fields: [classSessionId], references: [id])
   checkInTime       DateTime
   checkOutTime      DateTime?
-  attendanceStatus  AttendanceStatus @default(PRESENT)
+  attendanceStatus  String           @default("PRESENT")
   notes             String?
   createdAt         DateTime  @default(now())
 
@@ -131,8 +131,8 @@ model Newsletter {
   author          User      @relation("NewsletterAuthor", fields: [authorId], references: [id])
   publishDate     DateTime  @default(now())
   isPublished     Boolean   @default(false)
-  targetAudience  Audience  @default(ALL)
-  priority        Priority  @default(NORMAL)
+  targetAudience  String    @default("ALL")
+  priority        String    @default("NORMAL")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 
@@ -161,14 +161,14 @@ model Notification {
   id              String    @id @default(cuid())
   userId          String
   user            User      @relation(fields: [userId], references: [id])
-  type            NotificationType
+  type            String
   title           String
   message         String
   isRead          Boolean   @default(false)
-  deliveryMethod  DeliveryMethod @default(IN_APP)
+  deliveryMethod  String    @default("IN_APP")
   scheduledTime   DateTime?
   sentTime        DateTime?
-  status          NotificationStatus @default(PENDING)
+  status          String    @default("PENDING")
   createdAt       DateTime  @default(now())
 
   @@map("notifications")
@@ -187,73 +187,3 @@ model Setting {
   @@map("settings")
 }
 
-// Enums
-enum Role {
-  MEMBER
-  COACH
-  ADMIN
-}
-
-enum MembershipStatus {
-  ACTIVE
-  INACTIVE
-  SUSPENDED
-}
-
-enum SkillLevel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-  ALL
-}
-
-enum SessionStatus {
-  SCHEDULED
-  ONGOING
-  COMPLETED
-  CANCELLED
-}
-
-enum BookingStatus {
-  BOOKED
-  CHECKED_IN
-  NO_SHOW
-  CANCELLED
-}
-
-enum AttendanceStatus {
-  PRESENT
-  LATE
-  LEFT_EARLY
-}
-
-enum Audience {
-  ALL
-  MEMBERS
-  COACHES
-}
-
-enum Priority {
-  LOW
-  NORMAL
-  HIGH
-}
-
-enum NotificationType {
-  MISSED_CLASS
-  BOOKING_REMINDER
-  NEWSLETTER
-  GENERAL
-}
-
-enum DeliveryMethod {
-  EMAIL
-  SMS
-  IN_APP
-}
-
-enum NotificationStatus {
-  PENDING
-  SENT
-  FAILED
-}

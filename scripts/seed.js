@@ -58,49 +58,79 @@ async function main() {
 
   console.log('✅ Created default users')
 
-  // Create sample classes
-  const beginnerClass = await prisma.class.create({
+  // Create sample classes based on actual schedule
+  const morningAdultsClass = await prisma.class.create({
     data: {
-      name: 'Beginner Brazilian Jiu-Jitsu',
-      description: 'Perfect for newcomers to learn the fundamentals of BJJ',
+      name: 'Morning Adults Brazilian Jiu-Jitsu',
+      description: 'Morning BJJ training for adults',
       instructorId: coach.id,
       maxCapacity: 40,
       durationMinutes: 60,
-      skillLevel: 'BEGINNER',
+      skillLevel: 'ALL',
       isRecurring: true,
-      dayOfWeek: 1, // Monday
+      dayOfWeek: 1, // Monday (will create for Mon-Fri)
+      startTime: '09:30',
+      endTime: '10:30',
+    },
+  })
+
+  const eveningAdultsClass = await prisma.class.create({
+    data: {
+      name: 'Evening Adults Brazilian Jiu-Jitsu',
+      description: 'Evening BJJ training for adults',
+      instructorId: coach.id,
+      maxCapacity: 40,
+      durationMinutes: 60,
+      skillLevel: 'ALL',
+      isRecurring: true,
+      dayOfWeek: 1, // Monday (will create for Mon-Thu)
       startTime: '19:00',
       endTime: '20:00',
     },
   })
 
-  const intermediateClass = await prisma.class.create({
+  const kidsClass = await prisma.class.create({
     data: {
-      name: 'Intermediate Brazilian Jiu-Jitsu',
-      description: 'For students with some experience looking to advance their skills',
+      name: 'Kids Brazilian Jiu-Jitsu',
+      description: 'Fun and engaging BJJ classes for children',
       instructorId: coach.id,
       maxCapacity: 40,
-      durationMinutes: 60,
-      skillLevel: 'INTERMEDIATE',
+      durationMinutes: 45,
+      skillLevel: 'BEGINNER',
       isRecurring: true,
-      dayOfWeek: 3, // Wednesday
-      startTime: '19:30',
-      endTime: '20:30',
+      dayOfWeek: 1, // Monday (will create for Mon-Fri)
+      startTime: '18:00',
+      endTime: '18:45',
     },
   })
 
-  const allLevelsClass = await prisma.class.create({
+  const saturdayAdultsClass = await prisma.class.create({
     data: {
-      name: 'Open Mat',
+      name: 'Saturday Adults Brazilian Jiu-Jitsu',
+      description: 'Weekend BJJ training for adults',
+      instructorId: coach.id,
+      maxCapacity: 40,
+      durationMinutes: 60,
+      skillLevel: 'ALL',
+      isRecurring: true,
+      dayOfWeek: 6, // Saturday
+      startTime: '11:00',
+      endTime: '12:00',
+    },
+  })
+
+  const sundayOpenMat = await prisma.class.create({
+    data: {
+      name: 'Sunday Open Mat',
       description: 'Open training for all skill levels',
       instructorId: coach.id,
       maxCapacity: 40,
       durationMinutes: 90,
       skillLevel: 'ALL',
       isRecurring: true,
-      dayOfWeek: 5, // Friday
-      startTime: '18:00',
-      endTime: '19:30',
+      dayOfWeek: 0, // Sunday
+      startTime: '11:00',
+      endTime: '12:30',
     },
   })
 
@@ -111,43 +141,77 @@ async function main() {
   const sessions = []
 
   for (let week = 0; week < 4; week++) {
-    // Monday - Beginner class
-    const mondayDate = new Date(today)
-    mondayDate.setDate(today.getDate() + (week * 7) + (1 - today.getDay() + 7) % 7)
+    // Monday to Friday - Morning Adults (9:30 AM)
+    for (let day = 1; day <= 5; day++) {
+      const sessionDate = new Date(today)
+      sessionDate.setDate(today.getDate() + (week * 7) + (day - today.getDay() + 7) % 7)
+
+      sessions.push({
+        classId: morningAdultsClass.id,
+        sessionDate: sessionDate,
+        startTime: '09:30',
+        endTime: '10:30',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        status: 'SCHEDULED',
+      })
+    }
+
+    // Monday to Friday - Kids (6:00 PM)
+    for (let day = 1; day <= 5; day++) {
+      const sessionDate = new Date(today)
+      sessionDate.setDate(today.getDate() + (week * 7) + (day - today.getDay() + 7) % 7)
+
+      sessions.push({
+        classId: kidsClass.id,
+        sessionDate: sessionDate,
+        startTime: '18:00',
+        endTime: '18:45',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        status: 'SCHEDULED',
+      })
+    }
+
+    // Monday to Thursday - Evening Adults (7:00 PM)
+    for (let day = 1; day <= 4; day++) {
+      const sessionDate = new Date(today)
+      sessionDate.setDate(today.getDate() + (week * 7) + (day - today.getDay() + 7) % 7)
+
+      sessions.push({
+        classId: eveningAdultsClass.id,
+        sessionDate: sessionDate,
+        startTime: '19:00',
+        endTime: '20:00',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        status: 'SCHEDULED',
+      })
+    }
+
+    // Saturday - Adults (11:00 AM)
+    const saturdayDate = new Date(today)
+    saturdayDate.setDate(today.getDate() + (week * 7) + (6 - today.getDay() + 7) % 7)
 
     sessions.push({
-      classId: beginnerClass.id,
-      sessionDate: mondayDate,
-      startTime: '19:00',
-      endTime: '20:00',
+      classId: saturdayAdultsClass.id,
+      sessionDate: saturdayDate,
+      startTime: '11:00',
+      endTime: '12:00',
       instructorId: coach.id,
       maxCapacity: 40,
       status: 'SCHEDULED',
     })
 
-    // Wednesday - Intermediate class
-    const wednesdayDate = new Date(today)
-    wednesdayDate.setDate(today.getDate() + (week * 7) + (3 - today.getDay() + 7) % 7)
+    // Sunday - Open Mat (11:00 AM)
+    const sundayDate = new Date(today)
+    sundayDate.setDate(today.getDate() + (week * 7) + (0 - today.getDay() + 7) % 7)
 
     sessions.push({
-      classId: intermediateClass.id,
-      sessionDate: wednesdayDate,
-      startTime: '19:30',
-      endTime: '20:30',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      status: 'SCHEDULED',
-    })
-
-    // Friday - All levels
-    const fridayDate = new Date(today)
-    fridayDate.setDate(today.getDate() + (week * 7) + (5 - today.getDay() + 7) % 7)
-
-    sessions.push({
-      classId: allLevelsClass.id,
-      sessionDate: fridayDate,
-      startTime: '18:00',
-      endTime: '19:30',
+      classId: sundayOpenMat.id,
+      sessionDate: sundayDate,
+      startTime: '11:00',
+      endTime: '12:30',
       instructorId: coach.id,
       maxCapacity: 40,
       status: 'SCHEDULED',
@@ -162,7 +226,7 @@ async function main() {
 
   console.log('✅ Created upcoming class sessions')
 
-  // Create member progress for sample member
+  // Create member progress for sample member only (not coach)
   await prisma.memberProgress.create({
     data: {
       userId: member.id,
