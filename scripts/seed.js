@@ -58,9 +58,14 @@ async function main() {
 
   console.log('✅ Created default users')
 
-  // Create sample classes based on actual schedule
-  const morningAdultsClass = await prisma.class.create({
-    data: {
+  // Create sample classes based on actual schedule (using upsert to prevent duplicates)
+  const morningAdultsClass = await prisma.class.upsert({
+    where: {
+      // Use a unique combination of name and instructor
+      name: 'Morning Adults Brazilian Jiu-Jitsu'
+    },
+    update: {},
+    create: {
       name: 'Morning Adults Brazilian Jiu-Jitsu',
       description: 'Morning BJJ training for adults',
       instructorId: coach.id,
@@ -74,8 +79,10 @@ async function main() {
     },
   })
 
-  const eveningAdultsClass = await prisma.class.create({
-    data: {
+  const eveningAdultsClass = await prisma.class.upsert({
+    where: { name: 'Evening Adults Brazilian Jiu-Jitsu' },
+    update: {},
+    create: {
       name: 'Evening Adults Brazilian Jiu-Jitsu',
       description: 'Evening BJJ training for adults',
       instructorId: coach.id,
@@ -89,8 +96,10 @@ async function main() {
     },
   })
 
-  const kidsClass = await prisma.class.create({
-    data: {
+  const kidsClass = await prisma.class.upsert({
+    where: { name: 'Kids Brazilian Jiu-Jitsu' },
+    update: {},
+    create: {
       name: 'Kids Brazilian Jiu-Jitsu',
       description: 'Fun and engaging BJJ classes for children',
       instructorId: coach.id,
@@ -104,8 +113,10 @@ async function main() {
     },
   })
 
-  const saturdayAdultsClass = await prisma.class.create({
-    data: {
+  const saturdayAdultsClass = await prisma.class.upsert({
+    where: { name: 'Saturday Adults Brazilian Jiu-Jitsu' },
+    update: {},
+    create: {
       name: 'Saturday Adults Brazilian Jiu-Jitsu',
       description: 'Weekend BJJ training for adults',
       instructorId: coach.id,
@@ -119,8 +130,10 @@ async function main() {
     },
   })
 
-  const sundayOpenMat = await prisma.class.create({
-    data: {
+  const sundayOpenMat = await prisma.class.upsert({
+    where: { name: 'Sunday Open Mat' },
+    update: {},
+    create: {
       name: 'Sunday Open Mat',
       description: 'Open training for all skill levels',
       instructorId: coach.id,
@@ -218,10 +231,21 @@ async function main() {
     })
   }
 
+  // Check for existing sessions to prevent duplicates
   for (const sessionData of sessions) {
-    await prisma.classSession.create({
-      data: sessionData,
+    const existingSession = await prisma.classSession.findFirst({
+      where: {
+        classId: sessionData.classId,
+        sessionDate: sessionData.sessionDate,
+        startTime: sessionData.startTime,
+      }
     })
+
+    if (!existingSession) {
+      await prisma.classSession.create({
+        data: sessionData,
+      })
+    }
   }
 
   console.log('✅ Created upcoming class sessions')
