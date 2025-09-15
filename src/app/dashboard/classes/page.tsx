@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { formatDate, formatTime } from '@/lib/utils'
 import { Calendar, Users, Clock, User } from 'lucide-react'
+import Link from 'next/link'
 
 async function getClassesWithSessions() {
   return prisma.class.findMany({
@@ -21,10 +22,10 @@ async function getClassesWithSessions() {
             gte: new Date()
           }
         },
-        take: 3,
         orderBy: {
           sessionDate: 'asc'
         },
+        take: 3,
         include: {
           _count: {
             select: {
@@ -46,7 +47,7 @@ async function getClassesWithSessions() {
   })
 }
 
-export default async function ClassesPage() {
+export default async function ClassesPage({ searchParams }: { searchParams: { error?: string, success?: string } }) {
   const user = await requireAuth()
   const classes = await getClassesWithSessions()
 
@@ -57,6 +58,23 @@ export default async function ClassesPage() {
         <p className="text-muted-foreground">
           Browse and book available classes
         </p>
+
+        {/* Error/Success Messages */}
+        {searchParams.error && (
+          <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg">
+            {searchParams.error === 'class-full' && 'Class is full'}
+            {searchParams.error === 'already-booked' && 'You are already booked for this class'}
+            {searchParams.error === 'booking-failed' && 'Booking failed. Please try again.'}
+            {searchParams.error === 'missing-session' && 'Invalid session'}
+            {searchParams.error === 'session-not-found' && 'Session not found'}
+          </div>
+        )}
+
+        {searchParams.success && (
+          <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg">
+            {searchParams.success === 'booked' && 'Class booked successfully!'}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-6">
@@ -139,13 +157,20 @@ export default async function ClassesPage() {
                             <p className="text-sm text-muted-foreground">
                               {availableSpots} spots available
                             </p>
-                            <Button
-                              size="sm"
-                              disabled={availableSpots === 0}
-                              className="mt-1"
-                            >
-                              {availableSpots === 0 ? 'Full' : 'Book'}
-                            </Button>
+
+                            {/* HTML Form-based booking button */}
+                            {availableSpots === 0 ? (
+                              <Button size="sm" disabled className="mt-1">
+                                Full
+                              </Button>
+                            ) : (
+                              <form action="/dashboard/classes/book" method="POST" className="inline">
+                                <input type="hidden" name="classSessionId" value={session.id} />
+                                <Button size="sm" type="submit" className="mt-1">
+                                  Book
+                                </Button>
+                              </form>
+                            )}
                           </div>
                         </div>
                       )

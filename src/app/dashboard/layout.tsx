@@ -1,5 +1,6 @@
 import { requireAuth } from '@/lib/auth'
 import Navigation from '@/components/dashboard/Navigation'
+import { BackgroundSelector } from '@/components/ui/background-selector'
 
 export default async function DashboardLayout({
   children,
@@ -9,11 +10,14 @@ export default async function DashboardLayout({
   const user = await requireAuth()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" data-dashboard-container>
       <Navigation user={user} />
       <main className="flex-1">
-        {children}
+        <div className="backdrop-blur-sm min-h-screen bg-white/40">
+          {children}
+        </div>
       </main>
+      <BackgroundSelector />
     </div>
   )
 }

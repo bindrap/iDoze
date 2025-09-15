@@ -1,58 +1,95 @@
-import { requireAuth } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import { User, Mail, Phone, Calendar, Shield, AlertTriangle } from 'lucide-react'
 
-async function getUserProfile(userId: string) {
-  const [user, memberProgress] = await Promise.all([
-    prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        role: true,
-        membershipStatus: true,
-        membershipStartDate: true,
-        membershipEndDate: true,
-        emergencyContactName: true,
-        emergencyContactPhone: true,
-        medicalConditions: true,
-        isOnBench: true,
-        benchReason: true,
-        benchStartDate: true,
-        benchEndDate: true,
-        createdAt: true,
-      }
-    }),
-    prisma.memberProgress.findFirst({
-      where: { userId },
-      include: {
-        promotedBy: {
-          select: {
-            firstName: true,
-            lastName: true,
-          }
-        }
-      }
-    })
-  ])
-
-  return { user, memberProgress }
+type UserProfile = {
+  id: string
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  role: string
+  membershipStatus: string
+  membershipStartDate?: string
+  membershipEndDate?: string
+  emergencyContactName?: string
+  emergencyContactPhone?: string
+  medicalConditions?: string
+  isOnBench: boolean
+  benchReason?: string
+  benchStartDate?: string
+  benchEndDate?: string
+  createdAt: string
 }
 
-export default async function ProfilePage() {
-  const currentUser = await requireAuth()
-  const { user, memberProgress } = await getUserProfile(currentUser.id)
-
-  if (!user) {
-    return <div>User not found</div>
+type MemberProgress = {
+  beltRank?: string
+  stripes: number
+  totalClassesAttended: number
+  promotionDate?: string
+  lastAttendanceDate?: string
+  notes?: string
+  promotedBy?: {
+    firstName: string
+    lastName: string
   }
+}
+
+export default function ProfilePage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [user, setUser] = useState<UserProfile | null>(null)
+  const [memberProgress, setMemberProgress] = useState<MemberProgress | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin')
+      return
+    }
+
+    if (status === 'authenticated' && session.user?.id) {
+      fetchUserProfile()
+    }
+  }, [status, router, session])
+
+  const fetchUserProfile = async () => {
+    try {
+      const response = await fetch(`/api/users/${session?.user?.id}`, {
+        credentials: 'include'
+      })
+      if (!response.ok) throw new Error('Failed to fetch profile')
+      const data = await response.json()
+      setUser(data.user)
+      setMemberProgress(data.memberProgress)
+    } catch (error) {
+      setError('Failed to load profile')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleEditProfile = () => {
+    // For now, just show a simple alert - in a real app you'd open a modal or navigate to edit page
+    alert('Edit profile functionality would open a form here')
+  }
+
+  const handleAddEmergencyContact = () => {
+    // For now, just show a simple alert - in a real app you'd open a modal
+    alert('Add emergency contact functionality would open a form here')
+  }
+
+  if (loading) return <div className="container mx-auto py-8 px-4">Loading...</div>
+  if (error) return <div className="container mx-auto py-8 px-4 text-red-600">{error}</div>
+  if (!user) return <div className="container mx-auto py-8 px-4">User not found</div>
 
   const getRoleColor = (role: string) => {
     switch (role) {
@@ -141,7 +178,9 @@ export default async function ProfilePage() {
             </div>
 
             <div className="pt-4">
-              <Button className="w-full">Edit Profile</Button>
+              <a href="/dashboard/profile/edit">
+                <Button className="w-full">Edit Profile</Button>
+              </a>
             </div>
           </CardContent>
         </Card>
@@ -283,7 +322,9 @@ export default async function ProfilePage() {
             ) : (
               <div className="text-center py-4">
                 <p className="text-muted-foreground mb-4">No emergency contact information</p>
-                <Button variant="outline" size="sm">Add Emergency Contact</Button>
+                <a href="/dashboard/profile/emergency-contact">
+                  <Button variant="outline" size="sm">Add Emergency Contact</Button>
+                </a>
               </div>
             )}
           </CardContent>

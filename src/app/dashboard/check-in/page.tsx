@@ -65,7 +65,7 @@ async function getTodaysSessions() {
   })
 }
 
-export default async function CheckInPage() {
+export default async function CheckInPage({ searchParams }: { searchParams: { error?: string, success?: string } }) {
   const user = await requireAuth()
 
   // Only coaches and admins can access this page
@@ -82,6 +82,22 @@ export default async function CheckInPage() {
         <p className="text-muted-foreground">
           Manage student check-ins for today's classes
         </p>
+
+        {/* Error/Success Messages */}
+        {searchParams.error && (
+          <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg">
+            {searchParams.error === 'missing-data' && 'Missing required information'}
+            {searchParams.error === 'invalid-booking' && 'Invalid booking information'}
+            {searchParams.error === 'already-checked-in' && 'Student is already checked in'}
+            {searchParams.error === 'check-in-failed' && 'Check-in failed. Please try again.'}
+          </div>
+        )}
+
+        {searchParams.success && (
+          <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg">
+            {searchParams.success === 'checked-in' && 'Student checked in successfully!'}
+          </div>
+        )}
       </div>
 
       {sessions.length === 0 ? (
@@ -169,9 +185,14 @@ export default async function CheckInPage() {
                                     Checked In
                                   </span>
                                 ) : (
-                                  <Button size="sm" disabled={isPast}>
-                                    Check In
-                                  </Button>
+                                  <form action="/api/check-in" method="POST" className="inline">
+                                    <input type="hidden" name="userId" value={booking.userId} />
+                                    <input type="hidden" name="classSessionId" value={session.id} />
+                                    <input type="hidden" name="bookingId" value={booking.id} />
+                                    <Button size="sm" type="submit" disabled={isPast}>
+                                      Check In
+                                    </Button>
+                                  </form>
                                 )}
                               </div>
                             </div>

@@ -237,6 +237,21 @@ For production deployment:
 4. Configure proper SMTP settings for notifications
 5. Deploy to your preferred platform (Vercel, Netlify, etc.)
 
+
+# Students
+
+  ✅ Realistic Test Data Created
+
+  - 20 diverse students with varying:
+    - Belt ranks (White, Blue, Purple based on join date)
+    - Attendance patterns (High/Medium/Low consistency)
+    - Realistic join dates (up to 1 year ago)
+    - Emergency contacts and medical info
+  - 285+ bookings across existing classes
+  - Realistic attendance records based on consistency patterns
+  - All students use password: password123
+  - Email format: firstname.lastname@example.com
+
 ## Contributing
 
 1. Fork the repository
@@ -247,8 +262,12 @@ For production deployment:
 
 ## License
 
-This project is proprietary software developed for Tecumseh Jujutsu.
+This project is proprietary software developed for Tecumseh Jiu jutsu.
+
+## Visual Documentation
+
+📸 **[View Website Gallery](WEBSITE_GALLERY.md)** - Complete visual showcase of all features and interfaces
 
 ## Support
 
-For technical support or questions, contact the development team.# iDoze
+For technical support or questions, contact the development team.

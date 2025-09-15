@@ -1,42 +1,114 @@
-import { requireAuth } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { formatDate, formatTime } from '@/lib/utils'
 import { Calendar, User, Clock } from 'lucide-react'
 
-async function getUserBookings(userId: string) {
-  return prisma.booking.findMany({
-    where: { userId },
-    orderBy: {
-      classSession: {
-        sessionDate: 'desc'
-      }
-    },
-    include: {
-      classSession: {
-        include: {
-          class: {
-            select: {
-              name: true,
-              skillLevel: true,
-            }
-          },
-          instructor: {
-            select: {
-              firstName: true,
-              lastName: true,
-            }
-          }
-        }
-      }
+type Booking = {
+  id: string
+  bookingStatus: string
+  bookingDate: string
+  checkInTime?: string
+  classSession: {
+    id: string
+    sessionDate: string
+    startTime: string
+    endTime: string
+    class: {
+      name: string
+      skillLevel: string
     }
-  })
+    instructor: {
+      firstName: string
+      lastName: string
+    }
+  }
 }
 
-export default async function BookingsPage() {
-  const user = await requireAuth()
-  const bookings = await getUserBookings(user.id)
+export default function BookingsPage() {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [bookings, setBookings] = useState<Booking[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin')
+      return
+    }
+
+    if (status === 'authenticated') {
+      fetchBookings()
+    }
+  }, [status, router])
+
+  const fetchBookings = async () => {
+    try {
+      const response = await fetch('/api/bookings', {
+        credentials: 'include'
+      })
+      if (!response.ok) throw new Error('Failed to fetch bookings')
+      const data = await response.json()
+      setBookings(data.bookings || [])
+    } catch (error) {
+      setError('Failed to load bookings')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancelBooking = async (bookingId: string) => {
+    try {
+      const response = await fetch(`/api/bookings?id=${bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ bookingStatus: 'CANCELLED' })
+      })
+      if (!response.ok) throw new Error('Failed to cancel booking')
+      fetchBookings()
+    } catch (error) {
+      setError('Failed to cancel booking')
+    }
+  }
+
+  const handleCheckIn = async (bookingId: string) => {
+    try {
+      const response = await fetch(`/api/bookings?id=${bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ bookingStatus: 'CHECKED_IN' })
+      })
+      if (!response.ok) throw new Error('Failed to check in')
+      fetchBookings()
+    } catch (error) {
+      setError('Failed to check in')
+    }
+  }
+
+  const handleCheckOut = async (bookingId: string) => {
+    try {
+      const response = await fetch(`/api/bookings?id=${bookingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ bookingStatus: 'BOOKED' })
+      })
+      if (!response.ok) throw new Error('Failed to check out')
+      fetchBookings()
+    } catch (error) {
+      setError('Failed to check out')
+    }
+  }
+
+  if (loading) return <div className="container mx-auto py-8 px-4">Loading...</div>
+  if (error) return <div className="container mx-auto py-8 px-4 text-red-600">{error}</div>
 
   const upcomingBookings = bookings.filter(booking =>
     new Date(booking.classSession.sessionDate) >= new Date() &&
@@ -64,10 +136,12 @@ export default async function BookingsPage() {
           <Card>
             <CardContent className="text-center py-8">
               <p className="text-muted-foreground mb-4">No upcoming bookings</p>
-              <Button>
-                <Calendar className="w-4 h-4 mr-2" />
-                Book a Class
-              </Button>
+              <a href="/dashboard/classes">
+                <Button>
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book a Class
+                </Button>
+              </a>
             </CardContent>
           </Card>
         ) : (
@@ -111,20 +185,36 @@ export default async function BookingsPage() {
                       </p>
                       {booking.checkInTime && (
                         <p className="text-sm text-green-600">
-                          Checked in at: {formatTime(booking.checkInTime.toISOString())}
+                          Checked in at: {formatTime(booking.checkInTime)}
                         </p>
                       )}
                     </div>
                     <div className="flex gap-2">
                       {booking.bookingStatus === 'BOOKED' && (
                         <>
-                          <Button variant="outline" size="sm">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleCancelBooking(booking.id)}
+                          >
                             Cancel
                           </Button>
-                          <Button size="sm">
+                          <Button
+                            size="sm"
+                            onClick={() => handleCheckIn(booking.id)}
+                          >
                             Check In
                           </Button>
                         </>
+                      )}
+                      {booking.bookingStatus === 'CHECKED_IN' && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleCheckOut(booking.id)}
+                        >
+                          Check Out
+                        </Button>
                       )}
                     </div>
                   </div>

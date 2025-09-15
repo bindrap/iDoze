@@ -6,8 +6,8 @@ import { Providers } from './providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'iDoze - Tecumseh Jujutsu Management',
-  description: 'Advanced gym management system for Tecumseh Jujutsu',
+  title: 'Detroit & Tecumseh Jiu Jitsu Management',
+  description: 'Professional gym management system for Detroit & Tecumseh Jiu Jitsu academies',
 }
 
 export default function RootLayout({

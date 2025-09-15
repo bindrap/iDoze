@@ -1,5 +1,8 @@
-import { requireAuth } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -7,46 +10,98 @@ import { formatDate } from '@/lib/utils'
 import { Trophy, MapPin, Calendar, Users, DollarSign, ExternalLink, Plus } from 'lucide-react'
 import Link from 'next/link'
 
-async function getCompetitions() {
-  return prisma.competition.findMany({
-    where: {
-      isActive: true,
-      competitionDate: {
-        gte: new Date()
-      }
-    },
-    include: {
-      createdBy: {
-        select: {
-          firstName: true,
-          lastName: true,
-        }
-      },
-      participants: {
-        include: {
-          user: {
-            select: {
-              firstName: true,
-              lastName: true,
-            }
-          }
-        }
-      },
-      _count: {
-        select: {
-          participants: true
-        }
-      }
-    },
-    orderBy: {
-      competitionDate: 'asc'
+type Competition = {
+  id: string
+  name: string
+  description?: string
+  location: string
+  competitionDate: string
+  registrationDeadline?: string
+  entryFee?: number
+  website?: string
+  contactInfo?: string
+  divisions?: string
+  rules?: string
+  participants: {
+    id: string
+    userId: string
+    division?: string
+    status: string
+    user: {
+      firstName: string
+      lastName: string
     }
-  })
+  }[]
+  _count: {
+    participants: number
+  }
 }
 
-export default async function CompetitionsPage() {
-  const user = await requireAuth()
-  const competitions = await getCompetitions()
+export default function CompetitionsPage({ searchParams }: { searchParams: { error?: string, success?: string } }) {
+  const { data: session, status } = useSession()
+  const router = useRouter()
+  const [competitions, setCompetitions] = useState<Competition[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [registrationLoading, setRegistrationLoading] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin')
+      return
+    }
+
+    if (status === 'authenticated') {
+      fetchCompetitions()
+    }
+  }, [status, router])
+
+  const fetchCompetitions = async () => {
+    try {
+      const response = await fetch('/api/competitions', {
+        credentials: 'include'
+      })
+      if (!response.ok) throw new Error('Failed to fetch competitions')
+      const data = await response.json()
+      setCompetitions(data || [])
+    } catch (error) {
+      setError('Failed to load competitions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleRegister = async (competitionId: string) => {
+    setRegistrationLoading(competitionId)
+    try {
+      const response = await fetch('/api/competitions/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ competitionId })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to register')
+      }
+
+      fetchCompetitions() // Refresh competitions
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to register for competition')
+    } finally {
+      setRegistrationLoading(null)
+    }
+  }
+
+  const handleUpdateRegistration = async (competitionId: string) => {
+    // For now, just show a simple alert - in a real app you'd open a modal
+    alert('Registration update functionality would open a form here')
+  }
+
+  if (loading) return <div className="container mx-auto py-8 px-4">Loading...</div>
+  if (error) return <div className="container mx-auto py-8 px-4 text-red-600">{error}</div>
+  if (!session?.user) return null
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -68,7 +123,7 @@ export default async function CompetitionsPage() {
 
   const getUserParticipation = (competitionId: string) => {
     const competition = competitions.find(c => c.id === competitionId)
-    return competition?.participants.find(p => p.userId === user.id)
+    return competition?.participants.find(p => p.userId === session?.user?.id)
   }
 
   return (
@@ -80,13 +135,33 @@ export default async function CompetitionsPage() {
             Upcoming BJJ competitions and tournaments
           </p>
         </div>
-        {(user.role === 'COACH' || user.role === 'ADMIN') && (
+        {(session?.user?.role === 'COACH' || session?.user?.role === 'ADMIN') && (
           <Link href="/dashboard/competitions/new">
             <Button>
               <Plus className="w-4 h-4 mr-2" />
               Add Competition
             </Button>
           </Link>
+        )}
+
+        {/* Error/Success Messages */}
+        {searchParams.error && (
+          <div className="mt-4 p-3 bg-red-100 text-red-800 rounded-lg">
+            {searchParams.error === 'missing-competition' && 'Invalid competition'}
+            {searchParams.error === 'competition-not-found' && 'Competition not found'}
+            {searchParams.error === 'already-registered' && 'You are already registered for this competition'}
+            {searchParams.error === 'registration-closed' && 'Registration deadline has passed'}
+            {searchParams.error === 'registration-failed' && 'Registration failed. Please try again.'}
+            {searchParams.error === 'not-registered' && 'You are not registered for this competition'}
+            {searchParams.error === 'update-failed' && 'Update failed. Please try again.'}
+          </div>
+        )}
+
+        {searchParams.success && (
+          <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg">
+            {searchParams.success === 'registered' && 'Successfully registered for competition!'}
+            {searchParams.success === 'updated' && 'Registration updated successfully!'}
+          </div>
         )}
       </div>
 
@@ -98,7 +173,7 @@ export default async function CompetitionsPage() {
             <p className="text-muted-foreground mb-4">
               Check back later for upcoming tournaments and competitions
             </p>
-            {(user.role === 'COACH' || user.role === 'ADMIN') && (
+            {(session?.user?.role === 'COACH' || session?.user?.role === 'ADMIN') && (
               <Link href="/dashboard/competitions/new">
                 <Button>Add First Competition</Button>
               </Link>
@@ -252,16 +327,22 @@ export default async function CompetitionsPage() {
                                 Division: {userParticipation.division}
                               </p>
                             )}
-                            <Button variant="outline" size="sm" className="w-full">
-                              Update Registration
-                            </Button>
+                            <form action="/dashboard/competitions/update" method="POST" className="w-full">
+                              <input type="hidden" name="competitionId" value={competition.id} />
+                              <Button variant="outline" size="sm" type="submit" className="w-full">
+                                Update Registration
+                              </Button>
+                            </form>
                           </div>
                         ) : (
                           <div className="space-y-2">
                             {registrationOpen ? (
-                              <Button size="sm" className="w-full">
-                                Register for Competition
-                              </Button>
+                              <form action="/dashboard/competitions/register" method="POST" className="w-full">
+                                <input type="hidden" name="competitionId" value={competition.id} />
+                                <Button size="sm" type="submit" className="w-full">
+                                  Register for Competition
+                                </Button>
+                              </form>
                             ) : (
                               <Button size="sm" variant="outline" disabled className="w-full">
                                 Registration Closed

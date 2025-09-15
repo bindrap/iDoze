@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-config'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
@@ -28,34 +29,47 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const user = await prisma.user.findUnique({
-      where: { id: params.id },
-      select: {
-        id: true,
-        email: true,
-        firstName: true,
-        lastName: true,
-        phone: true,
-        role: true,
-        membershipStatus: true,
-        membershipStartDate: true,
-        membershipEndDate: true,
-        emergencyContactName: true,
-        emergencyContactPhone: true,
-        medicalConditions: true,
-        isOnBench: true,
-        benchReason: true,
-        benchStartDate: true,
-        benchEndDate: true,
-        createdAt: true,
-        updatedAt: true,
-      }
-    })
+    const [user, memberProgress] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: params.id },
+        select: {
+          id: true,
+          email: true,
+          firstName: true,
+          lastName: true,
+          phone: true,
+          role: true,
+          membershipStatus: true,
+          membershipStartDate: true,
+          membershipEndDate: true,
+          emergencyContactName: true,
+          emergencyContactPhone: true,
+          medicalConditions: true,
+          isOnBench: true,
+          benchReason: true,
+          benchStartDate: true,
+          benchEndDate: true,
+          createdAt: true,
+          updatedAt: true,
+        }
+      }),
+      prisma.memberProgress.findFirst({
+        where: { userId: params.id },
+        include: {
+          promotedBy: {
+            select: {
+              firstName: true,
+              lastName: true,
+            }
+          }
+        }
+      })
+    ])
 
     if (!user) {
       return NextResponse.json(
@@ -69,7 +83,7 @@ export async function GET(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    return NextResponse.json({ user })
+    return NextResponse.json({ user, memberProgress })
   } catch (error) {
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -83,7 +97,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -192,7 +206,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

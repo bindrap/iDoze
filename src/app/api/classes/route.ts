@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-config'
 import { z } from 'zod'
 
 const createClassSchema = z.object({
@@ -18,8 +19,11 @@ const createClassSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
+    console.log('Classes API session:', session)
+
     if (!session?.user) {
+      console.log('No session found in classes API')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -73,7 +77,20 @@ export async function GET(req: NextRequest) {
             orderBy: {
               sessionDate: 'asc'
             },
-            take: 3
+            take: 3,
+            include: {
+              _count: {
+                select: {
+                  bookings: {
+                    where: {
+                      bookingStatus: {
+                        in: ['BOOKED', 'CHECKED_IN']
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }),
@@ -99,7 +116,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session?.user || (session.user.role !== 'ADMIN' && session.user.role !== 'COACH')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

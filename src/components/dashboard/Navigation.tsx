@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 import {
   Users,
   Calendar,
@@ -45,6 +46,7 @@ export default function Navigation({ user }: NavigationProps) {
     { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
     { href: '/dashboard/bookings', label: 'My Bookings', icon: BookOpen },
     { href: '/dashboard/attendance', label: 'Attendance', icon: UserCheck },
+    { href: '/dashboard/my-analytics', label: 'My Analytics', icon: BarChart3 },
     { href: '/dashboard/competitions', label: 'Competitions', icon: Trophy },
     { href: '/dashboard/newsletters', label: 'Newsletters', icon: Newspaper },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
@@ -91,11 +93,27 @@ export default function Navigation({ user }: NavigationProps) {
   return (
     <>
       {/* Desktop Navigation */}
-      <nav className="bg-white border-b border-gray-200 px-4 lg:px-6 py-3">
+      <nav className="bg-gray-900 border-b border-gray-700 px-4 lg:px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
-            <Link href="/dashboard" className="text-xl font-bold text-blue-600">
-              iDoze
+            <Link href="/dashboard" className="flex items-center space-x-3">
+              <Image
+                src="/images/djj.png"
+                alt="Detroit Jiu Jitsu"
+                width={40}
+                height={40}
+                className="rounded"
+              />
+              <Image
+                src="/images/tjj.png"
+                alt="Tecumseh Jiu Jitsu"
+                width={40}
+                height={40}
+                className="rounded-full"
+              />
+              <span className="text-xl font-bold text-white hidden sm:block">
+                Detroit & Tecumseh Jiu Jitsu
+              </span>
             </Link>
             <div className="hidden md:flex ml-8 space-x-1">
               {navItems.map((item) => {
@@ -107,8 +125,8 @@ export default function Navigation({ user }: NavigationProps) {
                     className={cn(
                       "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                       pathname === item.href
-                        ? "bg-blue-100 text-blue-700"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "bg-blue-600 text-white"
+                        : "text-gray-300 hover:text-white hover:bg-gray-800"
                     )}
                   >
                     <Icon className="w-4 h-4 mr-2" />
@@ -120,13 +138,13 @@ export default function Navigation({ user }: NavigationProps) {
           </div>
 
           <div className="flex items-center space-x-4">
-            <div className="hidden md:block text-sm text-gray-600">
+            <div className="hidden md:block text-sm text-gray-300">
               {user.name || user.email}
               <span className={cn(
                 "ml-2 px-2 py-1 text-xs rounded-full",
-                user.role === 'ADMIN' ? "bg-red-100 text-red-800" :
-                user.role === 'COACH' ? "bg-blue-100 text-blue-800" :
-                "bg-green-100 text-green-800"
+                user.role === 'ADMIN' ? "bg-red-600 text-white" :
+                user.role === 'COACH' ? "bg-blue-600 text-white" :
+                "bg-green-600 text-white"
               )}>
                 {user.role}
               </span>
@@ -135,7 +153,7 @@ export default function Navigation({ user }: NavigationProps) {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="hidden md:flex items-center"
+              className="hidden md:flex items-center text-gray-300 hover:text-white hover:bg-gray-800"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
@@ -145,7 +163,7 @@ export default function Navigation({ user }: NavigationProps) {
             <Button
               variant="ghost"
               size="sm"
-              className="md:hidden"
+              className="md:hidden text-gray-300 hover:text-white"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -156,11 +174,11 @@ export default function Navigation({ user }: NavigationProps) {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200">
+        <div className="md:hidden bg-gray-800 border-b border-gray-600">
           <div className="px-4 py-3 space-y-1">
-            <div className="pb-3 mb-3 border-b border-gray-200">
-              <p className="text-sm font-medium text-gray-900">{user.name || user.email}</p>
-              <p className="text-xs text-gray-600">{user.role}</p>
+            <div className="pb-3 mb-3 border-b border-gray-600">
+              <p className="text-sm font-medium text-gray-100">{user.name || user.email}</p>
+              <p className="text-xs text-gray-400">{user.role}</p>
             </div>
             {navItems.map((item) => {
               const Icon = item.icon
@@ -171,8 +189,8 @@ export default function Navigation({ user }: NavigationProps) {
                   className={cn(
                     "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
                     pathname === item.href
-                      ? "bg-blue-100 text-blue-700"
-                      : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-300 hover:text-white hover:bg-gray-700"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -185,7 +203,7 @@ export default function Navigation({ user }: NavigationProps) {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="w-full justify-start mt-4"
+              className="w-full justify-start mt-4 text-gray-300 hover:text-white hover:bg-gray-700"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Sign Out
