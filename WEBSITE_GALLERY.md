@@ -18,63 +18,65 @@ A visual showcase of the Tecumseh Jujutsu Management System interface and featur
 ![Booking Interface](img/site/03-booking.png)
 *Class booking interface showing session details, instructor information, and booking confirmation flow.*
 
-### My Bookings
-![My Bookings](img/site/04-my-bookings.png)
-*Personal booking management page where members can view upcoming classes, check-in status, and manage their reservations.*
-
-## 👥 Student Management
-
-### Student Directory
-![Student Directory](img/site/05-students.png)
-*Comprehensive student listing with search functionality, belt ranks, and member status. Admins can manage all student records from this interface.*
-
-### Student Profile
-![Student Profile](img/site/06-student-profile.png)
-*Detailed student profile page showing personal information, progress tracking, and account management options.*
-
-### Belt Promotion
-![Belt Promotion](img/site/07-belt-promotion.png)
-*Belt promotion interface allowing instructors to advance students through belt ranks with proper tracking and documentation.*
-
-## 📊 Analytics & Reports
-
-### Analytics Dashboard
-![Analytics Overview](img/site/08-analytics.png)
-*Comprehensive analytics dashboard showing key metrics, class utilization, and business insights for gym management.*
-
-### Detailed Analytics
-![Detailed Analytics](img/site/09-detailed-analytics.png)
-*In-depth analytics with charts and graphs showing attendance patterns, member engagement, and performance metrics.*
-
-## 🏆 Competition Management
-
-### Competition Registration
-![Competition Registration](img/site/10-competition-register.png)
-*Competition management interface for organizing tournaments and tracking participant registrations.*
-
-### Competition Dashboard
-![Competition Dashboard](img/site/11-competition-dashboard.png)
-*Main competition dashboard showing upcoming events, participant lists, and competition management tools.*
-
-## ✅ Attendance Tracking
-
-### Check-in System
-![Check-in Interface](img/site/12-checkin.png)
-*Streamlined check-in system for coaches to mark student attendance during classes with quick search and selection.*
-
 ### Attendance History
+![Attendance History](img/site/04-my-bookings.png)
+*Comprehensive attendance tracking showing member participation history, class completion rates, and progress over time.*
+
+### Attendance Tracking
 ![Attendance Records](img/site/13-attendance.png)
 *Comprehensive attendance tracking showing historical records, patterns, and member participation statistics.*
 
+## 📊 Analytics & Reports
+
+### My Analytics
+![My Analytics](img/site/05-students.png)
+*Personal analytics dashboard showing individual progress metrics, attendance patterns, and achievement tracking for members.*
+
+### Profile
+![Profile](img/site/08-analytics.png)
+*User profile management interface where members can view and edit their personal information, emergency contacts, and account settings.*
+
+### Coach Analytics
+![Coach Analytics](img/site/14-newsletter.png)
+*Analytics dashboard specifically designed for instructors to track their class performance, student progress, and teaching metrics.*
+
+## 🔐 Authentication
+
+### Log In Home Page
+![Log In Home Page](img/site/09-detailed-analytics.png)
+*Landing page with authentication interface allowing users to sign in to access their personalized dashboard and features.*
+
+### Sign In Page
+![Sign In Page](img/site/10-competition-register.png)
+*User authentication page where members enter their credentials to access the system and their personal dashboard.*
+
+## 🏆 Competitions & Events
+
+### Competitions
+![Competitions](img/site/06-student-profile.png)
+*Competition management interface for viewing and registering for upcoming tournaments and martial arts events.*
+
+## 👨‍🏫 Coach Dashboard
+
+### Coach Dashboard
+![Coach Dashboard](img/site/11-competition-dashboard.png)
+*Instructor dashboard providing tools for class management, student tracking, and coaching administrative functions.*
+
+## 👥 Student Management
+
+### Student Management
+![Student Management](img/site/12-checkin.png)
+*Comprehensive student management interface for administrators to oversee member records, enrollment, and academic progress.*
+
+### Promote Student
+![Promote Student](img/site/15-newsletter-archive.png)
+*Student promotion interface allowing instructors to advance members through belt ranks with proper documentation and tracking.*
+
 ## 📧 Communication
 
-### Newsletter System
-![Newsletter Management](img/site/14-newsletter.png)
-*Newsletter creation and management system for gym-wide communications and announcements.*
-
-### Newsletter Archive
-![Newsletter Archive](img/site/15-newsletter-archive.png)
-*Archive of published newsletters with easy access to past communications and announcements.*
+### Newsletters
+![Newsletters](img/site/07-belt-promotion.png)
+*Newsletter management system for creating and distributing gym announcements, updates, and important communications to members.*
 
 ## 👤 Profile Management
 
@@ -86,9 +88,9 @@ A visual showcase of the Tecumseh Jujutsu Management System interface and featur
 ![Emergency Contacts](img/site/17-emergency-contacts.png)
 *Emergency contact management interface ensuring student safety with up-to-date contact information.*
 
-### Background Customization
-![Background Selector](img/site/18-background-selector.png)
-*Custom background selection feature allowing users to personalize their dashboard experience with preset images or custom uploads.*
+### Edit Profile
+![Edit Profile](img/site/18-background-selector.png)
+*Profile editing interface where users can update their personal information, contact details, and account preferences.*
 
 ## 🎨 Design Features
 
