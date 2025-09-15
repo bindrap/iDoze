@@ -58,94 +58,111 @@ async function main() {
 
   console.log('✅ Created default users')
 
-  // Create sample classes based on actual schedule (using upsert to prevent duplicates)
-  const morningAdultsClass = await prisma.class.upsert({
-    where: {
-      // Use a unique combination of name and instructor
-      name: 'Morning Adults Brazilian Jiu-Jitsu'
-    },
-    update: {},
-    create: {
-      name: 'Morning Adults Brazilian Jiu-Jitsu',
-      description: 'Morning BJJ training for adults',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      durationMinutes: 60,
-      skillLevel: 'ALL',
-      isRecurring: true,
-      dayOfWeek: 1, // Monday (will create for Mon-Fri)
-      startTime: '09:30',
-      endTime: '10:30',
-    },
+  // Create sample classes based on actual schedule (check for existing first)
+  let morningAdultsClass = await prisma.class.findFirst({
+    where: { name: 'Morning Adults Brazilian Jiu-Jitsu' }
   })
 
-  const eveningAdultsClass = await prisma.class.upsert({
-    where: { name: 'Evening Adults Brazilian Jiu-Jitsu' },
-    update: {},
-    create: {
-      name: 'Evening Adults Brazilian Jiu-Jitsu',
-      description: 'Evening BJJ training for adults',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      durationMinutes: 60,
-      skillLevel: 'ALL',
-      isRecurring: true,
-      dayOfWeek: 1, // Monday (will create for Mon-Thu)
-      startTime: '19:00',
-      endTime: '20:00',
-    },
+  if (!morningAdultsClass) {
+    morningAdultsClass = await prisma.class.create({
+      data: {
+        name: 'Morning Adults Brazilian Jiu-Jitsu',
+        description: 'Morning BJJ training for adults',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        durationMinutes: 60,
+        skillLevel: 'ALL',
+        isRecurring: true,
+        dayOfWeek: 1, // Monday (will create for Mon-Fri)
+        startTime: '09:30',
+        endTime: '10:30',
+      },
+    })
+  }
+
+  let eveningAdultsClass = await prisma.class.findFirst({
+    where: { name: 'Evening Adults Brazilian Jiu-Jitsu' }
   })
 
-  const kidsClass = await prisma.class.upsert({
-    where: { name: 'Kids Brazilian Jiu-Jitsu' },
-    update: {},
-    create: {
-      name: 'Kids Brazilian Jiu-Jitsu',
-      description: 'Fun and engaging BJJ classes for children',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      durationMinutes: 45,
-      skillLevel: 'BEGINNER',
-      isRecurring: true,
-      dayOfWeek: 1, // Monday (will create for Mon-Fri)
-      startTime: '18:00',
-      endTime: '18:45',
-    },
+  if (!eveningAdultsClass) {
+    eveningAdultsClass = await prisma.class.create({
+      data: {
+        name: 'Evening Adults Brazilian Jiu-Jitsu',
+        description: 'Evening BJJ training for adults',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        durationMinutes: 60,
+        skillLevel: 'ALL',
+        isRecurring: true,
+        dayOfWeek: 1, // Monday (will create for Mon-Thu)
+        startTime: '19:00',
+        endTime: '20:00',
+      },
+    })
+  }
+
+  let kidsClass = await prisma.class.findFirst({
+    where: { name: 'Kids Brazilian Jiu-Jitsu' }
   })
 
-  const saturdayAdultsClass = await prisma.class.upsert({
-    where: { name: 'Saturday Adults Brazilian Jiu-Jitsu' },
-    update: {},
-    create: {
-      name: 'Saturday Adults Brazilian Jiu-Jitsu',
-      description: 'Weekend BJJ training for adults',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      durationMinutes: 60,
-      skillLevel: 'ALL',
-      isRecurring: true,
-      dayOfWeek: 6, // Saturday
-      startTime: '11:00',
-      endTime: '12:00',
-    },
+  if (!kidsClass) {
+    kidsClass = await prisma.class.create({
+      data: {
+        name: 'Kids Brazilian Jiu-Jitsu',
+        description: 'Fun and engaging BJJ classes for children',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        durationMinutes: 45,
+        skillLevel: 'BEGINNER',
+        isRecurring: true,
+        dayOfWeek: 1, // Monday (will create for Mon-Fri)
+        startTime: '18:00',
+        endTime: '18:45',
+      },
+    })
+  }
+
+  let saturdayAdultsClass = await prisma.class.findFirst({
+    where: { name: 'Saturday Adults Brazilian Jiu-Jitsu' }
   })
 
-  const sundayOpenMat = await prisma.class.upsert({
-    where: { name: 'Sunday Open Mat' },
-    update: {},
-    create: {
-      name: 'Sunday Open Mat',
-      description: 'Open training for all skill levels',
-      instructorId: coach.id,
-      maxCapacity: 40,
-      durationMinutes: 90,
-      skillLevel: 'ALL',
-      isRecurring: true,
-      dayOfWeek: 0, // Sunday
-      startTime: '11:00',
-      endTime: '12:30',
-    },
+  if (!saturdayAdultsClass) {
+    saturdayAdultsClass = await prisma.class.create({
+      data: {
+        name: 'Saturday Adults Brazilian Jiu-Jitsu',
+        description: 'Weekend BJJ training for adults',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        durationMinutes: 60,
+        skillLevel: 'ALL',
+        isRecurring: true,
+        dayOfWeek: 6, // Saturday
+        startTime: '11:00',
+        endTime: '12:00',
+      },
+    })
+  }
+
+  let sundayOpenMat = await prisma.class.findFirst({
+    where: { name: 'Sunday Open Mat' }
   })
+
+  if (!sundayOpenMat) {
+    sundayOpenMat = await prisma.class.create({
+      data: {
+        name: 'Sunday Open Mat',
+        description: 'Open training for all skill levels',
+        instructorId: coach.id,
+        maxCapacity: 40,
+        durationMinutes: 90,
+        skillLevel: 'ALL',
+        isRecurring: true,
+        dayOfWeek: 0, // Sunday
+        startTime: '11:00',
+        endTime: '12:30',
+      },
+    })
+  }
 
   console.log('✅ Created sample classes')
 
@@ -306,6 +323,72 @@ async function main() {
   }
 
   console.log('✅ Created system settings')
+
+  // Create sample competitions
+  const competitionData = [
+    {
+      name: 'Ontario BJJ Championship 2025',
+      description: 'Annual provincial Brazilian Jiu-Jitsu championship featuring gi and no-gi divisions',
+      location: 'Toronto Convention Centre, Toronto, ON',
+      competitionDate: new Date(2025, 10, 15), // November 15, 2025
+      registrationDeadline: new Date(2025, 9, 15), // October 15, 2025
+      entryFee: 85.00,
+      website: 'https://ontariobjj.com/championship',
+      contactInfo: 'info@ontariobjj.com | (416) 555-0123',
+      divisions: 'Adult: White, Blue, Purple, Brown, Black | Masters: 30+, 40+, 50+ | Weight classes from Rooster to Ultra Heavy',
+      rules: 'IBJJF rules apply. Gi and No-Gi divisions available. Weigh-ins day of competition. No same-day registration.',
+      createdById: coach.id,
+    },
+    {
+      name: 'Grappling Industries - Windsor',
+      description: 'Expert level no-gi tournament with beginner friendly divisions',
+      location: 'WFCU Centre, Windsor, ON',
+      competitionDate: new Date(2025, 11, 8), // December 8, 2025
+      registrationDeadline: new Date(2025, 10, 22), // November 22, 2025
+      entryFee: 70.00,
+      website: 'https://grapplingindustries.com/windsor',
+      contactInfo: 'events@grapplingindustries.com',
+      divisions: 'Beginner, Intermediate, Advanced | No-Gi only | All weight classes',
+      rules: 'Modified ADCC rules. Submission only format for advanced divisions.',
+      createdById: admin.id,
+    }
+  ]
+
+  for (const comp of competitionData) {
+    const existing = await prisma.competition.findFirst({
+      where: { name: comp.name }
+    })
+
+    if (!existing) {
+      await prisma.competition.create({
+        data: comp,
+      })
+    }
+  }
+
+  // Add some sample participants
+  const competitions = await prisma.competition.findMany()
+  if (competitions.length > 0) {
+    // Register member for first competition
+    await prisma.competitionParticipant.upsert({
+      where: {
+        userId_competitionId: {
+          userId: member.id,
+          competitionId: competitions[0].id
+        }
+      },
+      update: {},
+      create: {
+        userId: member.id,
+        competitionId: competitions[0].id,
+        division: 'Adult White Belt - Light Feather',
+        weight: 64.0,
+        status: 'CONFIRMED'
+      }
+    })
+  }
+
+  console.log('✅ Created sample competitions')
 
   // Create a sample newsletter
   await prisma.newsletter.create({

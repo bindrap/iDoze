@@ -38,6 +38,8 @@ model User {
   promotions              MemberProgress[] @relation("PromotedBy")
   notifications           Notification[]
   updatedSettings         Setting[]
+  createdCompetitions     Competition[] @relation("CompetitionCreator")
+  competitionParticipants CompetitionParticipant[]
 
   @@map("users")
 }
@@ -185,5 +187,45 @@ model Setting {
   updatedAt    DateTime @updatedAt
 
   @@map("settings")
+}
+
+model Competition {
+  id              String    @id @default(cuid())
+  name            String
+  description     String?
+  location        String
+  competitionDate DateTime
+  registrationDeadline DateTime?
+  entryFee        Float?
+  website         String?
+  contactInfo     String?
+  divisions       String?  // JSON string of available divisions
+  rules           String?
+  isActive        Boolean   @default(true)
+  createdById     String
+  createdBy       User      @relation("CompetitionCreator", fields: [createdById], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  // Relations
+  participants    CompetitionParticipant[]
+
+  @@map("competitions")
+}
+
+model CompetitionParticipant {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  competitionId   String
+  competition     Competition @relation(fields: [competitionId], references: [id])
+  division        String?
+  weight          Float?
+  registeredAt    DateTime  @default(now())
+  status          String    @default("REGISTERED") // REGISTERED, CONFIRMED, CANCELLED
+  notes           String?
+
+  @@unique([userId, competitionId])
+  @@map("competition_participants")
 }
 

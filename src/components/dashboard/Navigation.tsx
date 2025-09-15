@@ -19,7 +19,9 @@ import {
   Clock,
   UserCheck,
   Newspaper,
-  Shield
+  Shield,
+  Trophy,
+  GraduationCap
 } from 'lucide-react'
 
 interface User {
@@ -43,12 +45,14 @@ export default function Navigation({ user }: NavigationProps) {
     { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
     { href: '/dashboard/bookings', label: 'My Bookings', icon: BookOpen },
     { href: '/dashboard/attendance', label: 'Attendance', icon: UserCheck },
+    { href: '/dashboard/competitions', label: 'Competitions', icon: Trophy },
     { href: '/dashboard/newsletters', label: 'Newsletters', icon: Newspaper },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
   ]
 
   const coachNavItems = [
     ...memberNavItems.slice(0, -1), // Remove profile for coaches, they get it separately
+    { href: '/dashboard/students', label: 'Students', icon: GraduationCap },
     { href: '/dashboard/check-in', label: 'Check-in', icon: Clock },
     { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
@@ -58,6 +62,8 @@ export default function Navigation({ user }: NavigationProps) {
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
     { href: '/dashboard/members', label: 'Members', icon: Users },
+    { href: '/dashboard/students', label: 'Students', icon: GraduationCap },
+    { href: '/dashboard/competitions', label: 'Competitions', icon: Trophy },
     { href: '/dashboard/check-in', label: 'Check-in', icon: Clock },
     { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/dashboard/newsletters', label: 'Newsletters', icon: Newspaper },
