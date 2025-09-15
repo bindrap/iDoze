@@ -5,89 +5,89 @@ A visual showcase of the Tecumseh Jujutsu Management System interface and featur
 ## 🏠 Dashboard & Navigation
 
 ### Member Dashboard
-![Member Dashboard](img/site/Screenshot%202025-09-15%20134215.png)
+![Member Dashboard](img/site/01-dashboard.png)
 *The main member dashboard showing personal progress, upcoming classes, and quick actions. Features belt rank tracking, attendance history, and easy access to class booking.*
 
 ## 📚 Class Management
 
 ### Class Browsing
-![Class Browsing](img/site/Screenshot%202025-09-15%20134552.png)
+![Class Browsing](img/site/02-classes.png)
 *Class listing page showing available classes with skill levels, schedules, and real-time availability. Members can book classes directly with available spot counts.*
 
 ### Booking System
-![Booking Interface](img/site/Screenshot%202025-09-15%20135040.png)
+![Booking Interface](img/site/03-booking.png)
 *Class booking interface showing session details, instructor information, and booking confirmation flow.*
 
 ### My Bookings
-![My Bookings](img/site/Screenshot%202025-09-15%20135100.png)
+![My Bookings](img/site/04-my-bookings.png)
 *Personal booking management page where members can view upcoming classes, check-in status, and manage their reservations.*
 
 ## 👥 Student Management
 
 ### Student Directory
-![Student Directory](img/site/Screenshot%202025-09-15%20135124.png)
+![Student Directory](img/site/05-students.png)
 *Comprehensive student listing with search functionality, belt ranks, and member status. Admins can manage all student records from this interface.*
 
 ### Student Profile
-![Student Profile](img/site/Screenshot%202025-09-15%20135139.png)
+![Student Profile](img/site/06-student-profile.png)
 *Detailed student profile page showing personal information, progress tracking, and account management options.*
 
 ### Belt Promotion
-![Belt Promotion](img/site/Screenshot%202025-09-15%20135156.png)
+![Belt Promotion](img/site/07-belt-promotion.png)
 *Belt promotion interface allowing instructors to advance students through belt ranks with proper tracking and documentation.*
 
 ## 📊 Analytics & Reports
 
 ### Analytics Dashboard
-![Analytics Overview](img/site/Screenshot%202025-09-15%20135216.png)
+![Analytics Overview](img/site/08-analytics.png)
 *Comprehensive analytics dashboard showing key metrics, class utilization, and business insights for gym management.*
 
 ### Detailed Analytics
-![Detailed Analytics](img/site/Screenshot%202025-09-15%20135257.png)
+![Detailed Analytics](img/site/09-detailed-analytics.png)
 *In-depth analytics with charts and graphs showing attendance patterns, member engagement, and performance metrics.*
 
 ## 🏆 Competition Management
 
 ### Competition Registration
-![Competition Registration](img/site/Screenshot%202025-09-15%20135320.png)
+![Competition Registration](img/site/10-competition-register.png)
 *Competition management interface for organizing tournaments and tracking participant registrations.*
 
 ### Competition Dashboard
-![Competition Dashboard](img/site/Screenshot%202025-09-15%20135400.png)
+![Competition Dashboard](img/site/11-competition-dashboard.png)
 *Main competition dashboard showing upcoming events, participant lists, and competition management tools.*
 
 ## ✅ Attendance Tracking
 
 ### Check-in System
-![Check-in Interface](img/site/Screenshot%202025-09-15%20135503.png)
+![Check-in Interface](img/site/12-checkin.png)
 *Streamlined check-in system for coaches to mark student attendance during classes with quick search and selection.*
 
 ### Attendance History
-![Attendance Records](img/site/Screenshot%202025-09-15%20135528.png)
+![Attendance Records](img/site/13-attendance.png)
 *Comprehensive attendance tracking showing historical records, patterns, and member participation statistics.*
 
 ## 📧 Communication
 
 ### Newsletter System
-![Newsletter Management](img/site/Screenshot%202025-09-15%20135558.png)
+![Newsletter Management](img/site/14-newsletter.png)
 *Newsletter creation and management system for gym-wide communications and announcements.*
 
 ### Newsletter Archive
-![Newsletter Archive](img/site/Screenshot%202025-09-15%20135716.png)
+![Newsletter Archive](img/site/15-newsletter-archive.png)
 *Archive of published newsletters with easy access to past communications and announcements.*
 
 ## 👤 Profile Management
 
 ### User Profile
-![User Profile](img/site/Screenshot%202025-09-15%20135825.png)
+![User Profile](img/site/16-profile.png)
 *Personal profile management where users can update their information, emergency contacts, and account settings.*
 
 ### Emergency Contacts
-![Emergency Contacts](img/site/Screenshot%202025-09-15%20140016.png)
+![Emergency Contacts](img/site/17-emergency-contacts.png)
 *Emergency contact management interface ensuring student safety with up-to-date contact information.*
 
 ### Background Customization
-![Background Selector](img/site/Screenshot%202025-09-15%20140043.png)
+![Background Selector](img/site/18-background-selector.png)
 *Custom background selection feature allowing users to personalize their dashboard experience with preset images or custom uploads.*
 
 ## 🎨 Design Features
