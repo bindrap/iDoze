@@ -100,7 +100,7 @@ Then open http://localhost:3000 in your browser.
 
 ## Docker Deployment (Recommended)
 
-### Quick Start with Docker
+### Quick Start with Docker (Development)
 
 ```bash
 # Clone repository
@@ -113,9 +113,42 @@ sudo docker compose up --build
 
 The application will be available at `http://localhost:3000`
 
+### Production Deployment (Public Access)
+
+For production deployment with external access (Oracle Cloud, AWS, etc.):
+
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd iDoze
+
+# Run production setup script
+./setup-production.sh
+```
+
+**What the production setup includes:**
+- ✅ **Nginx Reverse Proxy** - Professional routing and security headers
+- ✅ **Port 80 Access** - Standard HTTP port (no :3000 needed)
+- ✅ **Proper Docker Networking** - Internal container communication
+- ✅ **Firewall Configuration** - Automatic port opening
+- ✅ **Production Optimizations** - Gzip, rate limiting, caching
+
+**Cloud Provider Setup (Oracle Cloud/AWS/GCP):**
+1. **Security Groups/Firewall Rules** - Open these ports in your cloud console:
+   - Port 80 (HTTP) - `0.0.0.0/0`
+   - Port 443 (HTTPS) - `0.0.0.0/0` (for future SSL)
+2. **Access your app** at: `http://YOUR_SERVER_IP`
+
+**Example Oracle Cloud Security List Rules:**
+```
+Source CIDR: 0.0.0.0/0, Protocol: TCP, Port: 80, Description: HTTP for iDoze
+Source CIDR: 0.0.0.0/0, Protocol: TCP, Port: 443, Description: HTTPS for iDoze
+```
+
 ### Docker Services
-- **App Container**: Next.js application (Port 3000)
-- **PostgreSQL Database**: Persistent data storage (Port 5432)
+- **Nginx**: Reverse proxy and load balancer (Ports 80/443)
+- **App Container**: Next.js application (Internal port 3000)
+- **PostgreSQL Database**: Persistent data storage (Internal port 5432)
 
 ### Authentication Fix
 The Docker setup includes Prisma client configuration for ARM64 architecture:
