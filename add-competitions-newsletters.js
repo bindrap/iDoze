@@ -245,8 +245,8 @@ Building future champions!`,
               data: {
                 userId: member.id,
                 competitionId: competition.id,
-                weightClass: ['Lightweight', 'Middleweight', 'Heavyweight'][Math.floor(Math.random() * 3)],
-                registrationDate: new Date(),
+                division: ['Lightweight', 'Middleweight', 'Heavyweight'][Math.floor(Math.random() * 3)],
+                weight: Math.floor(Math.random() * 50) + 60, // Random weight between 60-110kg
                 status: 'REGISTERED'
               }
             })
