@@ -17,9 +17,10 @@ A comprehensive web application for managing jiu jitsu gym operations including 
 
 - **Frontend**: Next.js 14, React, TypeScript, Tailwind CSS
 - **Backend**: Next.js API Routes, NextAuth.js
-- **Database**: SQLite (via Prisma ORM)
+- **Database**: PostgreSQL (via Prisma ORM)
 - **Authentication**: NextAuth.js with credentials provider
 - **UI Components**: Radix UI, Lucide React icons
+- **Deployment**: Docker, Docker Compose
 
 ## Prerequisites
 
@@ -97,30 +98,84 @@ npm run dev
 
 Then open http://localhost:3000 in your browser.
 
-## Default Users & Test Data
+## Docker Deployment (Recommended)
 
-After seeding, you can log in with these accounts:
+### Quick Start with Docker
+
+```bash
+# Clone repository
+git clone <your-repo-url>
+cd iDoze
+
+# Start with Docker Compose
+sudo docker compose up --build
+```
+
+The application will be available at `http://localhost:3000`
+
+### Docker Services
+- **App Container**: Next.js application (Port 3000)
+- **PostgreSQL Database**: Persistent data storage (Port 5432)
+
+### Authentication Fix
+The Docker setup includes Prisma client configuration for ARM64 architecture:
+```prisma
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x", "linux-musl-arm64-openssl-1.1.x"]
+}
+```
+
+## Default Users & Demo Data
+
+After running the Docker setup, you can log in with these accounts:
 
 **Admin Account** (Full system access):
 - Email: `admin@tecumseh-jujutsu.com`
-- Password: `admin123`
+- Password: `password123`
 
 **Coach Account** (Coach + Member features):
 - Email: `coach@tecumseh-jujutsu.com`
-- Password: `coach123`
+- Password: `password123`
 
-**Member Account** (Basic member features):
-- Email: `member@tecumseh-jujutsu.com`
-- Password: `member123`
+**Demo Member Accounts** (All use password: `password123`):
+- Various belt ranks from White to Black belt
+- Different attendance patterns and payment statuses
+- Kids and adult members
 
-### Sample Classes Created:
-- **Morning Adults BJJ** - Monday-Friday 9:30-10:30 AM (All skill levels)
-- **Kids Brazilian Jiu-Jitsu** - Monday-Friday 6:00-6:45 PM (Ages 6-12)
-- **Evening Adults BJJ** - Monday-Thursday 7:00-8:00 PM (All skill levels)
-- **Saturday Adults BJJ** - Saturday 11:00 AM-12:00 PM (All skill levels)
-- **Sunday Open Mat** - Sunday 11:00 AM-12:30 PM (Open training for all levels)
+## Class Structure
 
-The seed script creates 4 weeks of upcoming class sessions, member progress data, system settings, and a sample newsletter.
+The system uses **4 Class Containers** with session tags for efficient management:
+
+### 🥋 **Adult Training**
+- **Monday 7:00-8:00 PM** (Gi)
+- **Tuesday 7:00-8:00 PM** (Gi)
+- **Wednesday 7:00-8:00 PM** (Gi)
+- **Thursday 7:00-8:00 PM** (No-Gi)
+- **Saturday 11:00 AM-12:00 PM** (No-Gi)
+
+### 🌅 **Morning Classes**
+- **Monday 9:30-10:30 AM**
+- **Wednesday 9:30-10:30 AM**
+- **Friday 9:30-10:30 AM**
+
+### 👶 **Kids Classes**
+- **Monday 6:00-7:00 PM**
+- **Tuesday 6:00-7:00 PM**
+- **Wednesday 6:00-7:00 PM**
+- **Thursday 6:00-7:00 PM**
+- **Friday 6:00-7:00 PM**
+
+### 🤝 **Open Mat**
+- **Sunday 11:00 AM-12:00 PM**
+
+### Demo Data Includes:
+- **19 Members** with realistic belt ranks (White to Black belt)
+- **4 Class Containers** with appropriate Gi/No-Gi tags
+- **86+ Class Sessions** (past 4 weeks + next 2 weeks)
+- **269+ Attendance Records** with realistic patterns
+- **21+ Upcoming Bookings**
+- **Payment History** with some overdue accounts
 
 ## Key Features Breakdown
 
