@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { formatDate, formatTime } from '@/lib/utils'
 import Link from 'next/link'
-import { Users, Calendar, TrendingUp, AlertCircle } from 'lucide-react'
+import { Users, Calendar, TrendingUp, AlertCircle, CreditCard } from 'lucide-react'
 
 async function getBusinessMetrics() {
   const now = new Date()
@@ -107,7 +107,7 @@ async function getRecentBookings() {
   return prisma.booking.findMany({
     take: 10,
     orderBy: {
-      bookingTime: 'desc'
+      bookingDate: 'desc'
     },
     include: {
       user: {
@@ -316,7 +316,7 @@ export default async function AdminDashboard() {
                       {booking.bookingStatus}
                     </span>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {formatDate(booking.bookingTime)}
+                      {formatDate(booking.bookingDate)}
                     </p>
                   </div>
                 </div>
@@ -330,7 +330,7 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Quick Actions for Admin */}
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Member Management</CardTitle>
@@ -342,6 +342,24 @@ export default async function AdminDashboard() {
             </Link>
             <Link href="/dashboard/admin/members/new">
               <Button variant="outline" className="w-full">Add New Member</Button>
+            </Link>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment Management</CardTitle>
+            <CardDescription>Track and manage payments</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Link href="/dashboard/admin/payments">
+              <Button className="w-full">
+                <CreditCard className="w-4 h-4 mr-2" />
+                Manage Payments
+              </Button>
+            </Link>
+            <Link href="/dashboard/admin/payments/overdue">
+              <Button variant="outline" className="w-full">View Overdue</Button>
             </Link>
           </CardContent>
         </Card>

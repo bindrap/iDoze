@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { formatDate, formatTime } from '@/lib/utils'
 import { Calendar, Users, Clock, User } from 'lucide-react'
 import Link from 'next/link'
+import { BookClassButton } from '@/components/dashboard/BookClassButton'
 
 async function getClassesWithSessions() {
   return prisma.class.findMany({
@@ -158,19 +159,11 @@ export default async function ClassesPage({ searchParams }: { searchParams: { er
                               {availableSpots} spots available
                             </p>
 
-                            {/* HTML Form-based booking button */}
-                            {availableSpots === 0 ? (
-                              <Button size="sm" disabled className="mt-1">
-                                Full
-                              </Button>
-                            ) : (
-                              <form action="/dashboard/classes/book" method="POST" className="inline">
-                                <input type="hidden" name="classSessionId" value={session.id} />
-                                <Button size="sm" type="submit" className="mt-1">
-                                  Book
-                                </Button>
-                              </form>
-                            )}
+                            {/* React component-based booking button */}
+                            <BookClassButton
+                              sessionId={session.id}
+                              availableSpots={availableSpots}
+                            />
                           </div>
                         </div>
                       )

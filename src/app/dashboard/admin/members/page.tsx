@@ -208,10 +208,10 @@ export default async function MembersPage() {
                         <span className="font-medium">Phone:</span> {member.phone || 'Not provided'}
                       </div>
                       <div>
-                        <span className="font-medium">Belt Rank:</span> {member.memberProgress?.beltRank || 'Not set'}
+                        <span className="font-medium">Belt Rank:</span> {member.memberProgress[0]?.beltRank || 'Not set'}
                       </div>
                       <div>
-                        <span className="font-medium">Classes:</span> {member.memberProgress?.totalClassesAttended || 0}
+                        <span className="font-medium">Classes:</span> {member.memberProgress[0]?.totalClassesAttended || 0}
                       </div>
                     </div>
 
@@ -227,9 +227,9 @@ export default async function MembersPage() {
                       </div>
                     )}
 
-                    {member.memberProgress?.lastAttendanceDate && (
+                    {member.memberProgress[0]?.lastAttendanceDate && (
                       <div className="mt-1 text-xs text-muted-foreground">
-                        Last attendance: {formatDate(member.memberProgress.lastAttendanceDate)}
+                        Last attendance: {formatDate(member.memberProgress[0].lastAttendanceDate)}
                       </div>
                     )}
                   </div>

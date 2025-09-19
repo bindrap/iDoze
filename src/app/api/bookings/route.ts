@@ -190,7 +190,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Check if user already has a booking for this session
+    // Check if user already has an ACTIVE booking for this session
     const existingBooking = await prisma.booking.findUnique({
       where: {
         userId_classSessionId: {
@@ -200,34 +200,69 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    if (existingBooking) {
+    if (existingBooking && existingBooking.bookingStatus === 'BOOKED') {
       return NextResponse.json(
         { error: 'Already booked for this session' },
         { status: 400 }
       )
     }
 
-    // Create booking
-    const booking = await prisma.booking.create({
-      data: {
-        userId: session.user.id,
-        classSessionId,
-      },
-      include: {
-        classSession: {
-          include: {
-            class: true,
-            instructor: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
+    if (existingBooking && existingBooking.bookingStatus === 'CHECKED_IN') {
+      return NextResponse.json(
+        { error: 'Already checked in for this session' },
+        { status: 400 }
+      )
+    }
+
+    // Create or update booking
+    let booking
+    if (existingBooking && existingBooking.bookingStatus === 'CANCELLED') {
+      // Reactivate cancelled booking
+      booking = await prisma.booking.update({
+        where: { id: existingBooking.id },
+        data: {
+          bookingStatus: 'BOOKED',
+          cancellationTime: null,
+          cancellationReason: null,
+        },
+        include: {
+          classSession: {
+            include: {
+              class: true,
+              instructor: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                }
               }
             }
           }
         }
-      }
-    })
+      })
+    } else {
+      // Create new booking
+      booking = await prisma.booking.create({
+        data: {
+          userId: session.user.id,
+          classSessionId,
+        },
+        include: {
+          classSession: {
+            include: {
+              class: true,
+              instructor: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                }
+              }
+            }
+          }
+        }
+      })
+    }
 
     // Update current bookings count
     await prisma.classSession.update({

@@ -95,7 +95,7 @@ export async function GET(
       return new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0]
     })
 
-    const uniqueDates = [...new Set(attendanceDates)].sort().reverse()
+    const uniqueDates = Array.from(new Set(attendanceDates)).sort().reverse()
 
     // Calculate current streak
     const today = new Date()

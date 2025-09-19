@@ -1,77 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { requireAuth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-config'
 
-export async function POST(request: NextRequest) {
+export async function POST(req: NextRequest) {
+  console.log('📝 Form booking attempt via /dashboard/classes/book/route.ts')
+
   try {
-    const user = await requireAuth()
-    const formData = await request.formData()
-    const classSessionId = formData.get('classSessionId') as string
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      console.log('❌ No session, redirecting to signin')
+      return NextResponse.redirect('http://localhost:3000/auth/signin')
+    }
 
-    console.log('📝 Form booking attempt for session:', classSessionId, 'by user:', user.id)
+    const formData = await req.formData()
+    const classSessionId = formData.get('classSessionId')?.toString()
+
+    console.log('📝 Form booking attempt for session:', classSessionId, 'by user:', session.user.id)
 
     if (!classSessionId) {
-      return NextResponse.redirect(new URL('/dashboard/classes?error=missing-session', request.url))
+      console.log('❌ No session ID provided')
+      return NextResponse.redirect('http://localhost:3000/dashboard/classes?error=missing-session')
     }
 
-    // Get class session details
-    const classSession = await prisma.classSession.findUnique({
-      where: { id: classSessionId },
-      include: {
-        class: true,
-        _count: {
-          select: {
-            bookings: {
-              where: {
-                bookingStatus: {
-                  in: ['BOOKED', 'CHECKED_IN']
-                }
-              }
-            }
-          }
-        }
-      }
+    // Make the booking via API
+    const bookingResponse = await fetch(`${req.nextUrl.origin}/api/bookings`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cookie': req.headers.get('cookie') || ''
+      },
+      body: JSON.stringify({ classSessionId })
     })
 
-    if (!classSession) {
-      return NextResponse.redirect(new URL('/dashboard/classes?error=session-not-found', request.url))
-    }
+    if (bookingResponse.ok) {
+      console.log('✅ Booking created successfully')
+      return NextResponse.redirect('http://localhost:3000/dashboard/classes?success=booked')
+    } else {
+      const errorData = await bookingResponse.json()
+      console.log('❌ Booking failed:', errorData.error)
 
-    // Check if class is full
-    if (classSession._count.bookings >= classSession.maxCapacity) {
-      return NextResponse.redirect(new URL('/dashboard/classes?error=class-full', request.url))
-    }
-
-    // Check if user already has a booking for this session
-    const existingBooking = await prisma.booking.findUnique({
-      where: {
-        userId_classSessionId: {
-          userId: user.id,
-          classSessionId
-        }
+      if (errorData.error === 'Already booked for this session') {
+        return NextResponse.redirect('http://localhost:3000/dashboard/classes?error=already-booked')
+      } else if (errorData.error === 'Class is full') {
+        return NextResponse.redirect('http://localhost:3000/dashboard/classes?error=class-full')
+      } else {
+        return NextResponse.redirect('http://localhost:3000/dashboard/classes?error=booking-failed')
       }
-    })
-
-    if (existingBooking) {
-      return NextResponse.redirect(new URL('/dashboard/classes?error=already-booked', request.url))
     }
-
-    // Create booking
-    await prisma.booking.create({
-      data: {
-        userId: user.id,
-        classSessionId,
-      }
-    })
-
-    console.log('✅ Booking created successfully')
-
-    // Redirect to bookings page with success message
-    return NextResponse.redirect(new URL('/dashboard/bookings?success=booked', request.url))
-
   } catch (error) {
-    console.error('❌ Booking error:', error)
-    return NextResponse.redirect(new URL('/dashboard/classes?error=booking-failed', request.url))
+    console.error('💥 Form booking error:', error)
+    return NextResponse.redirect('http://localhost:3000/dashboard/classes?error=booking-failed')
   }
 }

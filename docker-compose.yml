@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: idoze
+      POSTGRES_USER: idoze_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secure_password_123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U idoze_user -d idoze"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://idoze_user:${POSTGRES_PASSWORD:-secure_password_123}@postgres:5432/idoze
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-your-super-secret-nextauth-secret-key-here}
+      - NEXTAUTH_URL=${NEXTAUTH_URL:-http://localhost:3000}
+      - SMTP_HOST=${SMTP_HOST:-smtp.gmail.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - MAX_CLASS_CAPACITY=${MAX_CLASS_CAPACITY:-40}
+      - UTILIZATION_TARGET=${UTILIZATION_TARGET:-50}
+      - MISSED_CLASS_NOTIFICATION_DAYS=${MISSED_CLASS_NOTIFICATION_DAYS:-14}
+      - BOOKING_DEADLINE_HOURS=${BOOKING_DEADLINE_HOURS:-2}
+      - CANCELLATION_DEADLINE_HOURS=${CANCELLATION_DEADLINE_HOURS:-4}
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

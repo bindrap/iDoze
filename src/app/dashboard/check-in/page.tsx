@@ -23,6 +23,7 @@ async function getTodaysSessions() {
         select: {
           name: true,
           skillLevel: true,
+          maxCapacity: true,
         }
       },
       instructor: {
@@ -151,7 +152,7 @@ export default async function CheckInPage({ searchParams }: { searchParams: { er
                       <p className="text-sm text-muted-foreground mt-1">
                         <span className="flex items-center gap-1">
                           <UserCheck className="w-4 h-4" />
-                          {checkedInCount}/{bookedCount} checked in
+                          {checkedInCount}/{session.maxCapacity || session.class.maxCapacity} checked in
                         </span>
                       </p>
                     </div>

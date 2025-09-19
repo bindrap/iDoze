@@ -256,20 +256,29 @@ export async function POST(req: NextRequest) {
     })
 
     if (user) {
-      await prisma.memberProgress.upsert({
-        where: { userId: targetUserId },
-        update: {
-          totalClassesAttended: {
-            increment: 1
-          },
-          lastAttendanceDate: now,
-        },
-        create: {
-          userId: targetUserId,
-          totalClassesAttended: 1,
-          lastAttendanceDate: now,
-        }
+      const existingProgress = await prisma.memberProgress.findFirst({
+        where: { userId: targetUserId }
       })
+
+      if (existingProgress) {
+        await prisma.memberProgress.update({
+          where: { id: existingProgress.id },
+          data: {
+            totalClassesAttended: {
+              increment: 1
+            },
+            lastAttendanceDate: now,
+          }
+        })
+      } else {
+        await prisma.memberProgress.create({
+          data: {
+            userId: targetUserId,
+            totalClassesAttended: 1,
+            lastAttendanceDate: now,
+          }
+        })
+      }
     }
 
     return NextResponse.json(

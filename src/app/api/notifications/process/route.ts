@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
 
 async function processMissedClassNotifications(results: any) {
   try {
-    const notificationDays = await prisma.settings.findUnique({
-      where: { key: 'missed_class_notification_days' }
+    const notificationDays = await prisma.setting.findUnique({
+      where: { settingKey: 'missed_class_notification_days' }
     })
 
-    const daysThreshold = parseInt(notificationDays?.value || '14')
+    const daysThreshold = parseInt(notificationDays?.settingValue || '14')
     const cutoffDate = new Date()
     cutoffDate.setDate(cutoffDate.getDate() - daysThreshold)
 
@@ -46,8 +46,10 @@ async function processMissedClassNotifications(results: any) {
         membershipStatus: 'ACTIVE',
         isOnBench: false,
         memberProgress: {
-          lastAttendanceDate: {
-            lt: cutoffDate
+          some: {
+            lastAttendanceDate: {
+              lt: cutoffDate
+            }
           }
         }
       },
@@ -55,8 +57,8 @@ async function processMissedClassNotifications(results: any) {
         memberProgress: true,
         notifications: {
           where: {
-            notificationType: 'MISSED_CLASS',
-            sentAt: {
+            type: 'MISSED_CLASS',
+            sentTime: {
               gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // Last 7 days
             }
           },
@@ -75,7 +77,7 @@ async function processMissedClassNotifications(results: any) {
       const lastMissedSession = await prisma.classSession.findFirst({
         where: {
           sessionDate: {
-            gte: member.memberProgress?.lastAttendanceDate || cutoffDate,
+            gte: member.memberProgress[0]?.lastAttendanceDate || cutoffDate,
             lte: new Date()
           },
           status: 'COMPLETED',
@@ -120,10 +122,10 @@ async function processMissedClassNotifications(results: any) {
           await prisma.notification.create({
             data: {
               userId: member.id,
-              notificationType: 'MISSED_CLASS',
-              subject: emailContent.subject,
-              content: emailContent.text || '',
-              sentAt: new Date(),
+              type: 'MISSED_CLASS',
+              title: emailContent.subject,
+              message: emailContent.text || '',
+              sentTime: new Date(),
               status: 'SENT'
             }
           })
@@ -193,11 +195,11 @@ async function processClassReminders(results: any) {
         const existingNotification = await prisma.notification.findFirst({
           where: {
             userId: booking.user.id,
-            notificationType: 'CLASS_REMINDER',
-            sentAt: {
+            type: 'CLASS_REMINDER',
+            sentTime: {
               gte: new Date(Date.now() - 24 * 60 * 60 * 1000) // Last 24 hours
             },
-            content: {
+            message: {
               contains: session.id
             }
           }
@@ -224,10 +226,10 @@ async function processClassReminders(results: any) {
           await prisma.notification.create({
             data: {
               userId: booking.user.id,
-              notificationType: 'CLASS_REMINDER',
-              subject: emailContent.subject,
-              content: `${emailContent.text} | SessionId: ${session.id}`,
-              sentAt: new Date(),
+              type: 'CLASS_REMINDER',
+              title: emailContent.subject,
+              message: `${emailContent.text} | SessionId: ${session.id}`,
+              sentTime: new Date(),
               status: 'SENT'
             }
           })

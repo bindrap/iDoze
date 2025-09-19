@@ -22,7 +22,8 @@ import {
   Newspaper,
   Shield,
   Trophy,
-  GraduationCap
+  GraduationCap,
+  CreditCard
 } from 'lucide-react'
 
 interface User {
@@ -49,27 +50,29 @@ export default function Navigation({ user }: NavigationProps) {
     { href: '/dashboard/my-analytics', label: 'My Analytics', icon: BarChart3 },
     { href: '/dashboard/competitions', label: 'Competitions', icon: Trophy },
     { href: '/dashboard/newsletters', label: 'Newsletters', icon: Newspaper },
+    { href: '/dashboard/payment', label: 'Payment', icon: CreditCard },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
   ]
 
   const coachNavItems = [
-    ...memberNavItems.slice(0, -1), // Remove profile for coaches, they get it separately
+    ...memberNavItems.slice(0, -2), // Remove payment and profile for coaches, they get different versions
     { href: '/dashboard/students', label: 'Students', icon: GraduationCap },
     { href: '/dashboard/check-in', label: 'Check-in', icon: Clock },
     { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/dashboard/payment', label: 'Payment', icon: CreditCard },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
   ]
 
   const adminNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
-    { href: '/dashboard/members', label: 'Members', icon: Users },
+    { href: '/dashboard/admin/members', label: 'Members', icon: Users },
     { href: '/dashboard/students', label: 'Students', icon: GraduationCap },
     { href: '/dashboard/competitions', label: 'Competitions', icon: Trophy },
     { href: '/dashboard/check-in', label: 'Check-in', icon: Clock },
     { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
     { href: '/dashboard/newsletters', label: 'Newsletters', icon: Newspaper },
-    { href: '/admin', label: 'Admin', icon: Shield },
+    { href: '/dashboard/admin', label: 'Admin', icon: Shield },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
   ]
 

@@ -112,7 +112,11 @@ async function getCoachDashboardData(userId: string) {
           lt: endOfDay
         }
       },
-      include: {
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        maxCapacity: true,
         class: { select: { name: true } },
         _count: {
           select: {
@@ -207,7 +211,11 @@ async function getAdminDashboardData(userId: string) {
           lt: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1)
         }
       },
-      include: {
+      select: {
+        id: true,
+        startTime: true,
+        endTime: true,
+        maxCapacity: true,
         class: { select: { name: true } },
         instructor: { select: { firstName: true, lastName: true } },
         _count: {
@@ -465,8 +473,8 @@ function CoachDashboard({ user: profile, todaysSessions, weeklyStats, monthlySta
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{session._count.attendance}/{session._count.bookings}</p>
-                      <p className="text-xs text-muted-foreground">attended/booked</p>
+                      <p className="font-medium">{session._count.bookings}/{session.maxCapacity}</p>
+                      <p className="text-xs text-muted-foreground">booked/capacity</p>
                     </div>
                   </div>
                 ))}
@@ -576,8 +584,8 @@ function AdminDashboard({ user: profile, totalMembers, activeMembers, monthlyAtt
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium">{session._count.attendance}/{session._count.bookings}</p>
-                      <p className="text-xs text-muted-foreground">attended/booked</p>
+                      <p className="font-medium">{session._count.bookings}/{session.maxCapacity}</p>
+                      <p className="text-xs text-muted-foreground">booked/capacity</p>
                     </div>
                   </div>
                 ))}

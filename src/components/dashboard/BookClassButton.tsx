@@ -14,10 +14,12 @@ export function BookClassButton({ sessionId, availableSpots }: BookClassButtonPr
   const router = useRouter()
 
   const handleBookClass = async () => {
-    console.log('🔥 BOOK BUTTON CLICKED - sessionId:', sessionId)
+    console.log('🔥 REACT BOOK BUTTON CLICKED - sessionId:', sessionId)
+    console.log('🌐 Current URL:', window.location.href)
     setIsLoading(true)
 
     try {
+      console.log('📤 Making AJAX request to /api/bookings')
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
@@ -27,20 +29,21 @@ export function BookClassButton({ sessionId, availableSpots }: BookClassButtonPr
         body: JSON.stringify({ classSessionId: sessionId })
       })
 
-      console.log('📡 Booking response:', response.status, response.statusText)
+      console.log('📡 AJAX response:', response.status, response.statusText, response.url)
 
       if (response.ok) {
-        console.log('✅ Booking successful!')
+        console.log('✅ AJAX booking successful!')
         alert('Class booked successfully!')
-        router.refresh() // Refresh the page to show updated data
-        router.push('/dashboard/bookings')
+        console.log('🔄 About to refresh page')
+        // Simple page refresh that actually works
+        window.location.href = window.location.href
       } else {
         const errorData = await response.json()
-        console.error('❌ Booking error:', errorData)
+        console.error('❌ AJAX booking error:', errorData)
         alert(`Booking failed: ${errorData.error || 'Unknown error'}`)
       }
     } catch (error) {
-      console.error('💥 Network error:', error)
+      console.error('💥 AJAX Network error:', error)
       alert('Network error: Please check your connection')
     } finally {
       setIsLoading(false)

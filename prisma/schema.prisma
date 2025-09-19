@@ -1,10 +1,11 @@
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
@@ -18,6 +19,9 @@ model User {
   membershipStatus        String    @default("ACTIVE")
   membershipStartDate     DateTime?
   membershipEndDate       DateTime?
+  lastPaymentDate         DateTime?
+  nextPaymentDue          DateTime?
+  paymentStatus           String    @default("CURRENT") // CURRENT, OVERDUE, SUSPENDED
   emergencyContactName    String?
   emergencyContactPhone   String?
   medicalConditions       String?
@@ -40,6 +44,8 @@ model User {
   updatedSettings         Setting[]
   createdCompetitions     Competition[] @relation("CompetitionCreator")
   competitionParticipants CompetitionParticipant[]
+  payments                Payment[]
+  processedPayments       Payment[] @relation("PaymentProcessor")
 
   @@map("users")
 }
@@ -227,5 +233,24 @@ model CompetitionParticipant {
 
   @@unique([userId, competitionId])
   @@map("competition_participants")
+}
+
+model Payment {
+  id              String    @id @default(cuid())
+  userId          String
+  user            User      @relation(fields: [userId], references: [id])
+  amount          Float     @default(125.00)
+  paymentDate     DateTime
+  paymentMethod   String    @default("E_TRANSFER") // E_TRANSFER, CASH, CARD
+  transactionId   String?   // For e-transfer reference
+  status          String    @default("CONFIRMED") // PENDING, CONFIRMED, FAILED
+  forMonth        DateTime  // Which month this payment covers
+  notes           String?
+  processedById   String?
+  processedBy     User?     @relation("PaymentProcessor", fields: [processedById], references: [id])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("payments")
 }
 

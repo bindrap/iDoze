@@ -59,7 +59,7 @@ export async function POST(req: NextRequest) {
         userId,
         classSessionId,
         checkInTime: now,
-        notes: `Checked in by ${session.user.firstName} ${session.user.lastName}`
+        notes: `Checked in by ${session.user.name}`
       }
     })
 
