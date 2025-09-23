@@ -42,6 +42,7 @@ export default function Navigation({ user }: NavigationProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const pathname = usePathname()
 
+
   const memberNavItems = [
     { href: '/dashboard', label: 'Dashboard', icon: Home },
     { href: '/dashboard/classes', label: 'Classes', icon: Calendar },
@@ -59,6 +60,7 @@ export default function Navigation({ user }: NavigationProps) {
     { href: '/dashboard/students', label: 'Students', icon: GraduationCap },
     { href: '/dashboard/check-in', label: 'Check-in', icon: Clock },
     { href: '/dashboard/analytics', label: 'Analytics', icon: BarChart3 },
+    { href: '/dashboard/admin', label: 'Admin', icon: Shield },
     { href: '/dashboard/payment', label: 'Payment', icon: CreditCard },
     { href: '/dashboard/profile', label: 'Profile', icon: Settings },
   ]
@@ -115,10 +117,13 @@ export default function Navigation({ user }: NavigationProps) {
                 className="rounded-full"
               />
               <span className="text-xl font-bold text-white hidden sm:block">
-                Detroit & Tecumseh Jiu Jitsu
+                iDoze
+              </span>
+              <span className="text-sm font-bold text-white sm:hidden">
+                iDoze
               </span>
             </Link>
-            <div className="hidden md:flex ml-8 space-x-1">
+            <div className="hidden md:flex ml-8 space-x-2">
               {navItems.map((item) => {
                 const Icon = item.icon
                 return (
@@ -126,10 +131,10 @@ export default function Navigation({ user }: NavigationProps) {
                     key={item.href}
                     href={item.href}
                     className={cn(
-                      "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                      "flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 border",
                       pathname === item.href
-                        ? "bg-blue-600 text-white"
-                        : "text-gray-300 hover:text-white hover:bg-gray-800"
+                        ? "bg-blue-600 text-white shadow-lg border-blue-500 scale-105"
+                        : "text-gray-300 hover:text-white hover:bg-gray-700 hover:scale-105 border-transparent hover:border-gray-600 hover:shadow-md"
                     )}
                   >
                     <Icon className="w-4 h-4 mr-2" />
@@ -149,7 +154,7 @@ export default function Navigation({ user }: NavigationProps) {
                 user.role === 'COACH' ? "bg-blue-600 text-white" :
                 "bg-green-600 text-white"
               )}>
-                {user.role}
+{user.role}
               </span>
             </div>
             <Button
@@ -190,10 +195,10 @@ export default function Navigation({ user }: NavigationProps) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors",
+                    "flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200 border",
                     pathname === item.href
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-300 hover:text-white hover:bg-gray-700"
+                      ? "bg-blue-600 text-white shadow-lg border-blue-500"
+                      : "text-gray-300 hover:text-white hover:bg-gray-700 border-transparent hover:border-gray-600"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >

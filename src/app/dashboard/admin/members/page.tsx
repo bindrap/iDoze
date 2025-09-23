@@ -46,7 +46,10 @@ async function getMembers() {
 async function getMemberStats() {
   const [totalMembers, activeMembers, benchMembers, newMembers] = await Promise.all([
     prisma.user.count({
-      where: { role: 'MEMBER' }
+      where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
+      }
     }),
     prisma.user.count({
       where: {

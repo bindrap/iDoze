@@ -167,9 +167,10 @@ After running the Docker setup, you can log in with these accounts:
 - Email: `admin@tecumseh-jujutsu.com`
 - Password: `password123`
 
-**Coach Account** (Coach + Member features):
+**Coach Account** (Coach + Member features + Admin Access):
 - Email: `coach@tecumseh-jujutsu.com`
 - Password: `password123`
+- **NEW**: Full admin dashboard access for management tasks
 
 **Demo Member Accounts** (All use password: `password123`):
 - Various belt ranks from White to Black belt
@@ -223,6 +224,7 @@ The system uses **4 Class Containers** with session tags for efficient managemen
 - Check-in members to classes
 - View class utilization analytics
 - Manage class sessions
+- **NEW**: Full admin dashboard access with enhanced navigation
 
 ### 3. Admin Dashboard
 - Full system access including:

@@ -21,7 +21,10 @@ async function getBusinessMetrics() {
     benchMembers
   ] = await Promise.all([
     prisma.user.count({
-      where: { role: 'MEMBER' }
+      where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
+      }
     }),
 
     prisma.user.count({
@@ -169,7 +172,7 @@ async function getClassUtilization() {
 export default async function AdminDashboard() {
   const user = await requireAuth()
 
-  if (user.role !== 'ADMIN') {
+  if (user.role !== 'ADMIN' && user.role !== 'COACH') {
     return (
       <div className="container mx-auto py-8 px-4">
         <div className="text-center">
