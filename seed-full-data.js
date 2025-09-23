@@ -284,7 +284,7 @@ async function main() {
             userId: student.user.id,
             classSessionId: session.id,
             checkInTime: new Date(session.sessionDate.getTime() + Math.random() * 30 * 60 * 1000),
-            checkOutTime: new Date(session.sessionDate.getTime() + session.class?.durationMinutes * 60 * 1000 + Math.random() * 15 * 60 * 1000),
+            checkOutTime: new Date(session.sessionDate.getTime() + 60 * 60 * 1000 + Math.random() * 15 * 60 * 1000),
             attendanceStatus: 'PRESENT',
           }
         })

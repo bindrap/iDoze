@@ -167,49 +167,69 @@ After running the Docker setup, you can log in with these accounts:
 - Email: `admin@tecumseh-jujutsu.com`
 - Password: `password123`
 
-**Coach Account** (Coach + Member features + Admin Access):
+**Coach Account** (Eric Marentette - Head Coach):
 - Email: `coach@tecumseh-jujutsu.com`
 - Password: `password123`
 - **NEW**: Full admin dashboard access for management tasks
 
-**Demo Member Accounts** (All use password: `password123`):
-- Various belt ranks from White to Black belt
-- Different attendance patterns and payment statuses
-- Kids and adult members
+**Member Account** (Demo member):
+- Email: `member@tecumseh-jujutsu.com`
+- Password: `password123`
 
-## Class Structure
+**Real TJJ Member Accounts** (All use password: `TJJ2024!`):
+- 111+ actual Tecumseh Jujutsu members imported from gym roster
+- Complete belt hierarchy: Black, Brown, Purple, Blue, Green, Yellow, Grey, White
+- Accurate belt sizes (A1-A5) and stripe counts
+- Coach roles assigned to actual instructors
+- Email format: `[firstname.lastname]@tjj.com`
+
+**Example Real Member Logins:**
+- `andrew.archibald@tjj.com` / `TJJ2024!` (Black Belt)
+- `mark.curran@tjj.com` / `TJJ2024!` (Black Belt Coach)
+- `brooke.tofflemire@tjj.com` / `TJJ2024!` (Brown Belt Coach)
+- `nick.niforos@tjj.com` / `TJJ2024!` (Purple Belt Coach)
+- `shea.larose@tjj.com` / `TJJ2024!` (Purple Belt Coach)
+- `parteek.bindra@tjj.com` / `TJJ2024!` (Blue Belt, 3 stripes)
+- `gabby.nicoletti@tjj.com` / `TJJ2024!` (Green Belt - Kids)
+- `abe.iskandar@tjj.com` / `TJJ2024!` (Grey Belt, 4 stripes - Kids)
+
+## Class Structure & Instructors
 
 The system uses **4 Class Containers** with session tags for efficient management:
 
 ### 🥋 **Adult Training**
-- **Monday 7:00-8:00 PM** (Gi)
-- **Tuesday 7:00-8:00 PM** (Gi)
-- **Wednesday 7:00-8:00 PM** (Gi)
-- **Thursday 7:00-8:00 PM** (No-Gi)
-- **Saturday 11:00 AM-12:00 PM** (No-Gi)
+- **Monday 7:00-8:00 PM** (Gi) - **Mark Curran**
+- **Tuesday 7:00-8:00 PM** (Gi) - **Eric Marentette**
+- **Wednesday 7:00-8:00 PM** (Gi) - **Eric Marentette**
+- **Thursday 7:00-8:00 PM** (No-Gi) - **Eric Marentette**
+- **Saturday 11:00 AM-12:00 PM** (No-Gi) - **Eric Marentette**
 
 ### 🌅 **Morning Classes**
-- **Monday 9:30-10:30 AM**
-- **Wednesday 9:30-10:30 AM**
-- **Friday 9:30-10:30 AM**
+- **Monday 9:30-10:30 AM** - **Eric Marentette**
+- **Wednesday 9:30-10:30 AM** - **Eric Marentette**
+- **Friday 9:30-10:30 AM** - **Eric Marentette**
 
 ### 👶 **Kids Classes**
-- **Monday 6:00-7:00 PM**
-- **Tuesday 6:00-7:00 PM**
-- **Wednesday 6:00-7:00 PM**
-- **Thursday 6:00-7:00 PM**
-- **Friday 6:00-7:00 PM**
+- **Monday 6:00-7:00 PM** - **Eric Marentette**
+- **Tuesday 6:00-7:00 PM** - **Eric Marentette**
+- **Wednesday 6:00-7:00 PM** - **Eric Marentette**
+- **Thursday 6:00-7:00 PM** - **Eric Marentette**
+- **Friday 6:00-7:00 PM** - **Eric Marentette**
 
 ### 🤝 **Open Mat**
-- **Sunday 11:00 AM-12:00 PM**
+- **Sunday 11:00 AM-12:00 PM** - **Eric Marentette**
+
+**Instructor Notes:**
+- **Eric Marentette**: Head coach, teaches majority of classes
+- **Mark Curran**: Teaches Monday evening Adult Training only
 
 ### Demo Data Includes:
-- **19 Members** with realistic belt ranks (White to Black belt)
-- **4 Class Containers** with appropriate Gi/No-Gi tags
-- **86+ Class Sessions** (past 4 weeks + next 2 weeks)
-- **269+ Attendance Records** with realistic patterns
-- **21+ Upcoming Bookings**
-- **Payment History** with some overdue accounts
+- **111+ Real TJJ Members** with accurate belt ranks, stripes, and sizes
+- **14 Class Types** with proper instructor assignments
+- **56+ Class Sessions** (next 4 weeks scheduled)
+- **Realistic Attendance Patterns** based on member activity levels
+- **Active Bookings** for upcoming sessions
+- **Complete Member Progress Tracking** with belt advancement history
 
 ## Key Features Breakdown
 
@@ -398,19 +418,21 @@ railway deploy
 - [ ] Enable analytics/monitoring (optional)
 
 
-# Students
+# Real TJJ Member Data
 
-  ✅ Realistic Test Data Created
+  ✅ Actual Tecumseh Jujutsu Member Roster Imported
 
-  - 20 diverse students with varying:
-    - Belt ranks (White, Blue, Purple based on join date)
-    - Attendance patterns (High/Medium/Low consistency)
-    - Realistic join dates (up to 1 year ago)
-    - Emergency contacts and medical info
-  - 285+ bookings across existing classes
-  - Realistic attendance records based on consistency patterns
-  - All students use password: password123
-  - Email format: firstname.lastname@example.com
+  - **111+ Real Members** from actual gym roster with:
+    - **Complete Belt Hierarchy**: Black (8), Brown (10), Purple (17), Blue (31), Green (1), Yellow (1), Grey (2), White (41+)
+    - **Accurate Stripe Counts**: 0-4 stripes per belt rank
+    - **Proper Belt Sizes**: A1-A5 sizing from gym records
+    - **Coach Assignments**: Real instructors marked with COACH role
+    - **Member Status**: Active/Inactive based on gym notes
+    - **Injury Tracking**: Members marked as injured in notes
+  - **14 Class Sessions** covering all training times
+  - **Realistic Attendance Data** with booking patterns
+  - **Member Authentication**: TJJ2024! password for all real members
+  - **Email Format**: firstname.lastname@tjj.com
 
 ## Contributing
 
