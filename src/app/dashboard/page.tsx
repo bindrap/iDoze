@@ -149,16 +149,11 @@ async function getCoachDashboardData(userId: string) {
       }
     }),
 
-    // Total students who have attended coach's classes
+    // Total active members (same as admin view)
     prisma.user.count({
       where: {
-        attendance: {
-          some: {
-            classSession: {
-              instructorId: userId
-            }
-          }
-        }
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
       }
     })
   ])
@@ -180,12 +175,19 @@ async function getAdminDashboardData(userId: string) {
       }
     }),
 
-    // Total members
-    prisma.user.count(),
+    // Total members (only active members with MEMBER role)
+    prisma.user.count({
+      where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
+      }
+    }),
 
     // Active members (attended in last 30 days)
     prisma.user.count({
       where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE',
         attendance: {
           some: {
             checkInTime: {

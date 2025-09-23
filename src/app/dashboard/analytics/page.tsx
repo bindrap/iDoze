@@ -7,20 +7,27 @@ import { redirect } from 'next/navigation'
 
 async function getAnalyticsData() {
   const [
-    totalUsers,
-    activeMembers,
+    totalActiveMembers,
+    recentlyActiveMembers,
     totalClasses,
     thisMonthAttendance,
     todaysSessions,
     classesByDay,
     attendanceByMonth
   ] = await Promise.all([
-    // Total users
-    prisma.user.count(),
-
-    // Active members (attended class in last 30 days)
+    // Total active members
     prisma.user.count({
       where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
+      }
+    }),
+
+    // Recently active members (attended class in last 30 days)
+    prisma.user.count({
+      where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE',
         attendance: {
           some: {
             checkInTime: {
@@ -59,7 +66,12 @@ async function getAnalyticsData() {
           }
         },
         include: {
-          class: { select: { name: true } },
+          class: {
+            select: {
+              name: true,
+              maxCapacity: true
+            }
+          },
           _count: {
             select: {
               bookings: {
@@ -105,8 +117,8 @@ async function getAnalyticsData() {
   }, {} as Record<string, number>)
 
   return {
-    totalUsers,
-    activeMembers,
+    totalActiveMembers,
+    recentlyActiveMembers,
     totalClasses,
     thisMonthAttendance,
     todaysSessions,
@@ -146,8 +158,8 @@ export default async function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">Registered users</p>
+            <div className="text-2xl font-bold">{analytics.totalActiveMembers}</div>
+            <p className="text-xs text-muted-foreground">Active members</p>
           </CardContent>
         </Card>
 
@@ -159,8 +171,8 @@ export default async function AnalyticsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{analytics.activeMembers}</div>
-            <p className="text-xs text-muted-foreground">Active in last 30 days</p>
+            <div className="text-2xl font-bold">{analytics.recentlyActiveMembers}</div>
+            <p className="text-xs text-muted-foreground">Attended in last 30 days</p>
           </CardContent>
         </Card>
 
@@ -219,9 +231,9 @@ export default async function AnalyticsPage() {
                   </div>
                   <div className="text-right">
                     <p className="font-medium">
-                      {session._count.attendance}/{session._count.bookings}
+                      {session._count.attendance}/{session.maxCapacity || session.class.maxCapacity}
                     </p>
-                    <p className="text-sm text-muted-foreground">attended/booked</p>
+                    <p className="text-sm text-muted-foreground">attended/capacity</p>
                   </div>
                 </div>
               ))}
@@ -303,13 +315,13 @@ export default async function AnalyticsPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600">
-                {analytics.totalUsers > 0 ? Math.round((analytics.activeMembers / analytics.totalUsers) * 100) : 0}%
+                {analytics.totalActiveMembers > 0 ? Math.round((analytics.recentlyActiveMembers / analytics.totalActiveMembers) * 100) : 0}%
               </div>
               <p className="text-sm text-muted-foreground">Active Member Rate</p>
             </div>
             <div className="text-center">
               <div className="text-3xl font-bold text-blue-600">
-                {analytics.activeMembers > 0 ? Math.round(analytics.thisMonthAttendance / analytics.activeMembers) : 0}
+                {analytics.recentlyActiveMembers > 0 ? Math.round(analytics.thisMonthAttendance / analytics.recentlyActiveMembers) : 0}
               </div>
               <p className="text-sm text-muted-foreground">Avg Classes per Active Member</p>
             </div>

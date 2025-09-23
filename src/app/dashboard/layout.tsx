@@ -10,10 +10,10 @@ export default async function DashboardLayout({
   const user = await requireAuth()
 
   return (
-    <div className="min-h-screen" data-dashboard-container>
+    <div className="min-h-screen safe-top safe-bottom" data-dashboard-container>
       <Navigation user={user} />
       <main className="flex-1">
-        <div className="backdrop-blur-sm min-h-screen bg-white/40">
+        <div className="backdrop-blur-sm min-h-screen bg-white/40 pb-safe-bottom">
           {children}
         </div>
       </main>

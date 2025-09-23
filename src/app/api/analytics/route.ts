@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-config'
 import { addDays } from '@/lib/utils'
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await getServerSession()
+    const session = await getServerSession(authOptions)
     if (!session?.user || session.user.role === 'MEMBER') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -58,15 +59,19 @@ async function getOverviewAnalytics(startDate: Date, endDate: Date) {
     totalAttendance,
     averageUtilization
   ] = await Promise.all([
-    // Total members
+    // Total members (only active members)
     prisma.user.count({
-      where: { role: 'MEMBER' }
+      where: {
+        role: 'MEMBER',
+        membershipStatus: 'ACTIVE'
+      }
     }),
 
     // Active members (attended at least once in period)
     prisma.user.count({
       where: {
         role: 'MEMBER',
+        membershipStatus: 'ACTIVE',
         attendance: {
           some: {
             checkInTime: {

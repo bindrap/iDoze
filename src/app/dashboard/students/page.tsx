@@ -1,80 +1,130 @@
-import { requireAuth } from '@/lib/auth'
-import { prisma } from '@/lib/db'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
-import { Users, TrendingUp, Award, Calendar, Clock } from 'lucide-react'
-import { redirect } from 'next/navigation'
+import { Users, TrendingUp, Award, Calendar, Clock, Trash2, UserX } from 'lucide-react'
 import Link from 'next/link'
 
-async function getStudentsWithProgress() {
-  return prisma.user.findMany({
-    where: {
-      role: 'MEMBER',
-      membershipStatus: 'ACTIVE'
-    },
-    include: {
-      memberProgress: true,
-      attendance: {
-        take: 1,
-        orderBy: {
-          checkInTime: 'desc'
-        }
-      },
-      _count: {
-        select: {
-          attendance: true
-        }
-      }
-    },
-    orderBy: [
-      { firstName: 'asc' },
-      { lastName: 'asc' }
-    ]
-  })
+type Student = {
+  id: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string
+  membershipStatus: string
+  beltSize?: string
+  createdAt: string
+  memberProgress?: {
+    id: string
+    beltRank?: string
+    stripes: number
+    notes?: string
+  }[]
+  attendance?: {
+    id: string
+    checkInTime: string
+  }[]
+  _count: {
+    attendance: number
+  }
 }
 
-async function getRecentPromotions() {
-  return prisma.memberProgress.findMany({
-    where: {
-      promotionDate: {
-        not: null
-      }
-    },
-    include: {
-      user: {
-        select: {
-          firstName: true,
-          lastName: true,
-        }
-      },
-      promotedBy: {
-        select: {
-          firstName: true,
-          lastName: true,
-        }
-      }
-    },
-    orderBy: {
-      promotionDate: 'desc'
-    },
-    take: 5
-  })
+type Promotion = {
+  id: string
+  beltRank?: string
+  stripes: number
+  promotionDate?: string
+  user: {
+    firstName: string
+    lastName: string
+  }
+  promotedBy?: {
+    firstName: string
+    lastName: string
+  }
 }
 
-export default async function StudentsPage() {
-  const user = await requireAuth()
+export default function StudentsPage() {
+  const { data: session } = useSession()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const [students, setStudents] = useState<Student[]>([])
+  const [recentPromotions, setRecentPromotions] = useState<Promotion[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
 
-  // Only coaches and admins can access this page
-  if (user.role !== 'COACH' && user.role !== 'ADMIN') {
-    redirect('/dashboard')
+  // Check authorization
+  if (session?.user?.role !== 'COACH' && session?.user?.role !== 'ADMIN') {
+    router.push('/dashboard')
+    return null
   }
 
-  const [students, recentPromotions] = await Promise.all([
-    getStudentsWithProgress(),
-    getRecentPromotions()
-  ])
+  useEffect(() => {
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    // Show success message if redirected from creation
+    const success = searchParams.get('success')
+    if (success === 'created') {
+      // You could add a toast notification here
+    }
+  }, [searchParams])
+
+  const fetchData = async () => {
+    try {
+      const [studentsRes, promotionsRes] = await Promise.all([
+        fetch('/api/students?limit=200', { credentials: 'include' }),
+        fetch('/api/member-progress/recent-promotions', { credentials: 'include' })
+      ])
+
+      if (studentsRes.ok) {
+        const studentsData = await studentsRes.json()
+        setStudents(studentsData.students || [])
+      }
+
+      if (promotionsRes.ok) {
+        const promotionsData = await promotionsRes.json()
+        setRecentPromotions(promotionsData || [])
+      }
+    } catch (error) {
+      setError('Failed to load data')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDeleteStudent = async (studentId: string, studentName: string) => {
+    if (!confirm(`Are you sure you want to remove ${studentName}? This action cannot be undone.`)) {
+      return
+    }
+
+    setDeleteLoading(studentId)
+    try {
+      const response = await fetch(`/api/students/${studentId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to remove student')
+      }
+
+      // Remove student from list
+      setStudents(prev => prev.filter(s => s.id !== studentId))
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to remove student')
+    } finally {
+      setDeleteLoading(null)
+    }
+  }
 
   const getBeltColor = (beltRank?: string | null) => {
     const belt = beltRank?.toLowerCase()
@@ -108,14 +158,38 @@ export default async function StudentsPage() {
     }
   }
 
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <div className="flex items-center justify-center">
+          <p>Loading students...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Student Management</h1>
-        <p className="text-muted-foreground">
-          View student progress and manage promotions
-        </p>
+      <div className="mb-8 flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Student Management</h1>
+          <p className="text-muted-foreground">
+            View student progress and manage promotions
+          </p>
+        </div>
+        <Link href="/dashboard/students/new">
+          <Button>
+            <Users className="w-4 h-4 mr-2" />
+            Add Student
+          </Button>
+        </Link>
       </div>
+
+      {error && (
+        <div className="mb-6 p-3 bg-red-100 text-red-800 rounded-lg">
+          {error}
+        </div>
+      )}
 
       {/* Recent Promotions */}
       <Card className="mb-8">
@@ -202,7 +276,7 @@ export default async function StudentsPage() {
                         </Badge>
                       </div>
 
-                      <div className="grid md:grid-cols-3 gap-4 text-sm text-muted-foreground">
+                      <div className="grid md:grid-cols-4 gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <TrendingUp className="w-4 h-4" />
                           <span>{student._count.attendance} total classes</span>
@@ -220,6 +294,13 @@ export default async function StudentsPage() {
                           <Clock className="w-4 h-4" />
                           <span>Member since {formatDate(student.createdAt)}</span>
                         </div>
+                        {student.beltSize && (
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              Belt Size: {student.beltSize}
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       {progress?.notes && (
@@ -241,6 +322,30 @@ export default async function StudentsPage() {
                           View Progress
                         </Button>
                       </Link>
+                      <Link href={`/dashboard/students/${student.id}/status`}>
+                        <Button size="sm" variant="secondary" className="w-full">
+                          Update Status
+                        </Button>
+                      </Link>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="w-full"
+                        onClick={() => handleDeleteStudent(student.id, `${student.firstName} ${student.lastName}`)}
+                        disabled={deleteLoading === student.id}
+                      >
+                        {deleteLoading === student.id ? (
+                          <>
+                            <UserX className="w-4 h-4 mr-2" />
+                            Removing...
+                          </>
+                        ) : (
+                          <>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Remove
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </div>
                 )

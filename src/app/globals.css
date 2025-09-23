@@ -86,3 +86,46 @@
   background-position: center !important;
   background-attachment: fixed !important;
 }
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  .container {
+    @apply px-2;
+  }
+
+  /* Touch-friendly buttons */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Better mobile text sizes */
+  .text-xs { font-size: 0.75rem; }
+  .text-sm { font-size: 0.875rem; }
+
+  /* Mobile-friendly cards */
+  .card {
+    @apply mx-2;
+  }
+
+  /* Prevent horizontal scroll */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Mobile form inputs */
+  input, textarea, select {
+    @apply text-base; /* Prevents zoom on iOS */
+  }
+}
+
+/* PWA safe area handling */
+@supports (padding: max(0px)) {
+  .safe-top {
+    padding-top: max(env(safe-area-inset-top), 0px);
+  }
+
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+}

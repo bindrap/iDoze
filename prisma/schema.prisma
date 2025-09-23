@@ -25,6 +25,7 @@ model User {
   emergencyContactName    String?
   emergencyContactPhone   String?
   medicalConditions       String?
+  beltSize                String?   // Gi size: A1, A2, A3, A4, A5
   isOnBench               Boolean   @default(false)
   benchReason             String?
   benchStartDate          DateTime?

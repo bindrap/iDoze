@@ -161,6 +161,7 @@ export default function CompetitionsPage({ searchParams }: { searchParams: { err
           <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg">
             {searchParams.success === 'registered' && 'Successfully registered for competition!'}
             {searchParams.success === 'updated' && 'Registration updated successfully!'}
+            {searchParams.success === 'created' && 'Competition created successfully!'}
           </div>
         )}
       </div>

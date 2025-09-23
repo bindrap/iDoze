@@ -33,7 +33,7 @@ export default function PaymentPage() {
 
   const fetchMembers = async () => {
     try {
-      const response = await fetch('/api/users?role=MEMBER&limit=100')
+      const response = await fetch('/api/users?role=MEMBER&status=ACTIVE&limit=200')
       if (response.ok) {
         const data = await response.json()
         setMembers(data.users || [])

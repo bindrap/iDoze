@@ -7,7 +7,20 @@ const nextConfig = {
     serverComponentsExternalPackages: ['@prisma/client', 'bcryptjs']
   },
   images: {
-    domains: ['localhost'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/**',
+      }
+    ],
     formats: ['image/webp', 'image/avif'],
     minimumCacheTTL: 86400
   },
